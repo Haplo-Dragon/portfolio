@@ -33,6 +33,17 @@ WEAPON_STATS = os.path.join(
     "Item Lists",
     "WeaponStats.csv")
 
+CLERIC_SPELLS = [
+    'Bless', 'Command', 'Cure Light Wounds', 'Detect Evil',
+    'Invisibility to Undead', 'Protection from Evil',
+    'Purify Food & Drink', 'Remove Fear', 'Sanctuary', 'Turn Undead']
+
+SPELL_FIELDS = [
+    'Spell', 'Duration', 'Range', 'Save',
+    'Reversible', 'Effect', 'Flavor', 'Page']
+
+WEAPON_FIELDS = ['Weapon', 'Damage', 'Short', 'Medium', 'Long', 'Ammo']
+
 CHARACTER_GEN_URL = "http://character.totalpartykill.ca/lotfp/json"
 
 
@@ -42,7 +53,11 @@ def combine_dicts(dict1, dict2):
     return combined
 
 
-def generate_dict(equiplist, type='NonEnc'):
+def add_PDF_field_names(equiplist, type='NonEnc'):
+    """Takes a list of items and their type and returns a dictionary with the items
+     as values and the type followed by a sequential number (type0, type1, etc.) as
+     keys. These are generally used to fill fields in a blank PDF, with keys
+     corresponding to field names."""
     equipdict = {}
     for i in range(len(equiplist)):
         prefix = type + str(i)
@@ -168,7 +183,7 @@ def format_equipment_list(details, calculate_encumbrance=True):
     equipment, money = split_money(equipment)
 
     # Generate dictionary version of the normal equipment list
-    normal_equipment = generate_dict(equipment, 'Normal')
+    normal_equipment = add_PDF_field_names(equipment, 'Normal')
 
     if calculate_encumbrance:
         encumbrance = {'Encumbrance': get_encumbrance(
@@ -201,7 +216,7 @@ def split_over(target, filename=None):
             over.append(item)
             target.remove(item)
 
-    over = generate_dict(over, 'Over')
+    over = add_PDF_field_names(over, 'Over')
 
     return (target, over)
 
@@ -219,7 +234,7 @@ def split_tiny(target, filename=None):
             non_enc.append(item)
             target.remove(item)
 
-    non_enc = generate_dict(non_enc, 'NonEnc')
+    non_enc = add_PDF_field_names(non_enc, 'NonEnc')
 
     return (target, non_enc)
 
@@ -275,18 +290,13 @@ def get_weapons_and_stats(target, filename=None):
     listofdicts = []
 
     if filename is None:
-        with open(WEAPON_STATS) as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if row['Weapon'] in target:
-                    listofdicts.append(row)
-
-    else:
-        with open(filename) as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if row['Weapon'] in target:
-                    listofdicts.append(row)
+        filename = WEAPON_STATS
+    
+    with open(filename) as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row['Weapon'] in target:
+                listofdicts.append(row)
 
     # Find ammo in equipment list and associate it with the correct weapon.
     for weapon in listofdicts:
@@ -297,11 +307,10 @@ def get_weapons_and_stats(target, filename=None):
                     weapon['Ammo'] = item[arrows_index - 3:]
         else:
             weapon['Ammo'] = ""
-
-    fields = ['Weapon', 'Damage', 'Short', 'Medium', 'Long', 'Ammo']
+    
     i = 0
     for item in listofdicts:
-        for name in fields:
+        for name in WEAPON_FIELDS:
             prefix = name + str(i)
             item[prefix] = item[name]
             del item[name]
@@ -320,60 +329,61 @@ def clear_mod_zeroes(modsdict):
     return modsdict
 
 
-def create_spellsheet_pdf(details, name, filename=None, directory=None):
-    cleric_spells = [
-        'Bless', 'Command', 'Cure Light Wounds', 'Detect Evil',
-        'Invisibility to Undead', 'Protection from Evil',
-        'Purify Food & Drink', 'Remove Fear', 'Sanctuary', 'Turn Undead']
-    spell_list = details['spell']
-    if details['class'] == 'Magic-User':
+def add_class_based_spells(spell_list, pc_class):
+    if pc_class == 'Magic-User':
         spell_list.append('Summon')
-    if details['class'] == 'Cleric':
-        spell_list = cleric_spells
-    if details['class'] == 'Elf':
+    if pc_class == 'Cleric':
+        spell_list = CLERIC_SPELLS
+    if pc_class == 'Elf':
         spell_list = ['Read Magic']
+    return spell_list
 
-    spell_name = name + ' Spells.pdf'
-    spell_fdf_name = name + ' Spells.fdf'
+
+def get_spell_details(spell_list, filename=None):
+    """Create a list of dictionaries containing spell names, details, and flavor
+    text for spell_list, drawn from the file specified or from the default
+    file defined in LEVEL_ONE_SPELLS."""
+    spell_details = []
+    if filename is None:
+        filename = LEVEL_ONE_SPELLS
+
+    with open(filename) as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row['Spell'] in spell_list:
+                spell_details.append(row)
+
+    return spell_details
+
+
+def create_spellsheet_pdf(details, name, filename=None, directory=None):
+    spell_list = details['spell']
+    spell_list = add_class_based_spells(spell_list, details['class'])
+
     # Correct for spelling error in Magic Missile
     if 'Magic Missle' in spell_list:
         spell_list.remove('Magic Missle')
         spell_list.append('Magic Missile')
 
-    listofdicts = []
+    listofdicts = get_spell_details(spell_list, filename=None)
 
-    if filename is None:
-        with open(LEVEL_ONE_SPELLS) as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if row['Spell'] in spell_list:
-                    listofdicts.append(row)
-
-    else:
-        with open(filename) as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if row['Spell'] in spell_list:
-                    listofdicts.append(row)
-
-    fields = [
-        'Spell', 'Duration', 'Range',
-        'Save', 'Reversible', 'Effect',
-        'Flavor', 'Page']
     i = 0
     for item in listofdicts:
-        for name in fields:
+        for name in SPELL_FIELDS:
             prefix = name + str(i)
             item[prefix] = item[name]
             del item[name]
         i += 1
 
-    spell_list = generate_dict(spell_list, 'Spell')
+    spell_list = add_PDF_field_names(spell_list, 'Spell')
     for item in listofdicts:
         spell_list = combine_dicts(spell_list, item)
 
     if directory is None:
         directory = tempfile.TemporaryDirectory(dir=os.getcwd()).name
+
+    spell_name = name + ' Spells.pdf'
+    spell_fdf_name = name + ' Spells.fdf'
 
     fdf_spell_data = forge_fdf("", spell_list, [], [], [])
     with open(os.path.join(directory, spell_fdf_name), 'wb') as f:
