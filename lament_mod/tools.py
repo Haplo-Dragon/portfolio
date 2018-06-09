@@ -291,7 +291,7 @@ def get_weapons_and_stats(target, filename=None):
 
     if filename is None:
         filename = WEAPON_STATS
-    
+
     with open(filename) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -307,7 +307,7 @@ def get_weapons_and_stats(target, filename=None):
                     weapon['Ammo'] = item[arrows_index - 3:]
         else:
             weapon['Ammo'] = ""
-    
+
     i = 0
     for item in listofdicts:
         for name in WEAPON_FIELDS:
