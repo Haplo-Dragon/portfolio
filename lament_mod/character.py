@@ -23,9 +23,14 @@ class LotFPCharacter(object):
         self.skills = self.get_skills(self.details['skills'], self.mods)
 
         self.calculate_encumbrance = calculate_encumbrance
-        self.equipment = tools.format_equipment_list(self.details, self.calculate_encumbrance)
+        self.equipment = tools.format_equipment_list(
+            self.details,
+            self.calculate_encumbrance)
         self.attacks = self.calculate_attack_bonuses(self.mods, self.pcClass)
-        self.AC = self.calculate_armor_classes(self.mods, self.equipment, self.details['ac'])
+        self.AC = self.calculate_armor_classes(
+            self.mods,
+            self.equipment,
+            self.details['ac'])
 
         # Lots of the entries in the original character details have
         # been reformatted, so we'll remove them.
@@ -129,7 +134,7 @@ class LotFPCharacter(object):
         :return: A dictionary of saves in the form 'poison': 12.
         """
         lotfp_saves = {
-            'Cleric': {'poison': 11, 'wands': 12, 'stone': 14, 'breath': 16, 'magic': 15, },
+            'Cleric': {'poison': 11, 'wands': 12, 'stone': 14, 'breath': 16, 'magic': 15,},
             'Fighter': {'poison': 12, 'wands': 13, 'stone': 14, 'breath': 15, 'magic': 16},
             'Magic-User': {'poison': 13, 'wands': 13, 'stone': 13, 'breath': 16, 'magic': 14},
             'Specialist': {'poison': 16, 'wands': 14, 'stone': 14, 'breath': 15, 'magic': 14},
