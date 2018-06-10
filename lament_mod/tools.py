@@ -301,16 +301,7 @@ def get_weapons_and_stats(target, filename=None):
     A prime target for refactoring into several smaller functions.
     """
     weapondict = {}
-    listofdicts = []
-
-    if filename is None:
-        filename = WEAPON_STATS
-
-    with open(filename) as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row['Weapon'] in target:
-                listofdicts.append(row)
+    listofdicts = get_item_details(target, 'Weapon', filename=None)
 
     # Find ammo in equipment list and associate it with the correct weapon.
     for weapon in listofdicts:
@@ -355,22 +346,23 @@ def add_class_based_spells(spell_list, pc_class):
     return spell_list
 
 
-def get_spell_details(spell_list, filename=None):
-    """Create a list of dictionaries containing spell names, details, and flavor
-    text for spell_list, drawn from the file specified or from the default
-    file defined in LEVEL_ONE_SPELLS.
+def get_item_details(original_item_list, item_type, filename=None):
+    """Create a list of dictionaries containing item names, details, and flavor
+    text for original_item_list, drawn from the file specified or from the default
+    files defined in LEVEL_ONE_SPELLS and WEAPON_STATS.
     """
-    spell_details = []
+    item_types = {'Spell': LEVEL_ONE_SPELLS, 'Weapon': WEAPON_STATS}
+    item_details = []
     if filename is None:
-        filename = LEVEL_ONE_SPELLS
+        filename = item_types[item_type]
 
     with open(filename) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            if row['Spell'] in spell_list:
-                spell_details.append(row)
+            if row[item_type] in original_item_list:
+                item_details.append(row)
 
-    return spell_details
+    return item_details
 
 
 def create_spell_list(original_spell_list, pcClass):
@@ -387,7 +379,7 @@ def create_spell_list(original_spell_list, pcClass):
 def create_spellsheet_pdf(details, name, filename=None, directory=None):
     """Get spell list for character, fill spell sheet PDF with spell information."""
     spell_list = create_spell_list(details['spell'], details['class'])
-    spell_details = get_spell_details(spell_list, filename=None)
+    spell_details = get_item_details(spell_list, 'Spell', filename=None)
 
     i = 0
     for item in spell_details:
