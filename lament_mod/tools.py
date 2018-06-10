@@ -63,9 +63,9 @@ def add_PDF_field_names(equiplist, type='NonEnc'):
      corresponding to field names.
      """
     equipdict = {}
-    for i in range(len(equiplist)):
-        prefix = type + str(i)
-        equipdict[prefix] = equiplist[i]
+    for index, item in enumerate(equiplist):
+        prefix = ''.join((type, str(index)))
+        equipdict[prefix] = equiplist[index]
     return equipdict
 
 
