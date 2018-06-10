@@ -159,7 +159,6 @@ def fetch_character(pc_class=None):
         return details
 
 
-# TODO: Refactor this huge mess of a function?
 def format_equipment_list(details, calculate_encumbrance=True):
     """
     Split the huge, unsorted equipment list provided by the remote
