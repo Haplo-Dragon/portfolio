@@ -8,7 +8,7 @@ from lament_mod import tools
     (['Shield', 'Giant pole', 'ROUS'], "Oversized")])
 def test_generate_dict(equip_list, equip_type):
     equip_dict = tools.add_PDF_field_names(equip_list, equip_type)
-    assert type(equip_dict) is dict
+    assert isinstance(equip_dict, dict)
     for item in equip_dict.items():
         assert equip_type in item[0]
 
