@@ -206,11 +206,10 @@ def format_equipment_list(details, calculate_encumbrance=True):
 def split_over(target, filename=None):
     over = []
     if filename is None:
-        with open(OVERSIZED_ITEMS, 'r') as o:
-            oversized = o.read().splitlines()
-    else:
+        filename = OVERSIZED_ITEMS
         with open(filename, 'r') as o:
             oversized = o.read().splitlines()
+
     for item in target:
         if item in oversized:
             over.append(item)
@@ -224,11 +223,10 @@ def split_over(target, filename=None):
 def split_tiny(target, filename=None):
     non_enc = []
     if filename is None:
-        with open(TINY_ITEMS, 'r') as t:
-            tiny = t.read().splitlines()
-    else:
+        filename = TINY_ITEMS
         with open(filename, 'r') as t:
             tiny = t.read().splitlines()
+
     for item in tiny:
         if item in target:
             non_enc.append(item)
@@ -254,23 +252,24 @@ def split_money(target):
     return (target, money)
 
 
-def get_encumbrance(normal_item_dict, oversized_item_dict, pc_class):
-    # Set encumbrance from normal (that is, encumbering) items carried
-    # Encumbrance is calculated from number of items carried, in multiples
-    # of 5. 0-5 items is 0 encumbrance, 6-10 is 1 encumbrance, 11-16 is two
-    # encumbrance, etc. This is why we're taking the whole number result of
-    # a division by 5.1 — it goes up by one after each multiple of 5.
-    encumbrance = int(len(normal_item_dict) / 5.1)
+def get_encumbrance(normal_items, oversized_items, pc_class):
+    """Set encumbrance from normal (that is, encumbering) items carried.
+
+    Encumbrance is calculated from number of items carried, in multiples of 5.
+    0-5 items is 0 encumbrance, 6-10 is 1 encumbrance, 11-16 is 2 encumbrance,
+    etc. This is why we're taking the whole number result of a division
+    by 5.1 — it goes up by one after each multiple of 5."""
+    encumbrance = int(len(normal_items) / 5.1)
 
     # Check for chain or plate armor that would add extra encumbrance
-    if 'Chain Armor' in normal_item_dict.values():
+    if 'Chain Armor' in normal_items.values():
         encumbrance += 1
-    if 'Plate Armor' in normal_item_dict.values():
+    if 'Plate Armor' in normal_items.values():
         encumbrance += 2
 
     # Check for oversized items (shields, polearms, etc.).
     # Each oversized item adds an encumbrance point.
-    encumbrance += len(oversized_item_dict)
+    encumbrance += len(oversized_items)
 
     # Dwarves can carry more, so their first point of encumbrance
     # doesn't count.
@@ -365,10 +364,10 @@ def create_spellsheet_pdf(details, name, filename=None, directory=None):
         spell_list.remove('Magic Missle')
         spell_list.append('Magic Missile')
 
-    listofdicts = get_spell_details(spell_list, filename=None)
+    spell_details = get_spell_details(spell_list, filename=None)
 
     i = 0
-    for item in listofdicts:
+    for item in spell_details:
         for name in SPELL_FIELDS:
             prefix = name + str(i)
             item[prefix] = item[name]
@@ -376,7 +375,7 @@ def create_spellsheet_pdf(details, name, filename=None, directory=None):
         i += 1
 
     spell_list = add_PDF_field_names(spell_list, 'Spell')
-    for item in listofdicts:
+    for item in spell_details:
         spell_list = combine_dicts(spell_list, item)
 
     if directory is None:
