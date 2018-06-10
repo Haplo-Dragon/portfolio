@@ -198,11 +198,16 @@ def format_equipment_list(details, calculate_encumbrance=True):
         encumbrance = {'Encumbrance': ""}
 
     # Create a combined equipment list
-    comb_equipment = combine_dicts(nonenc_equipment, over_equipment)
-    comb_equipment = combine_dicts(comb_equipment, normal_equipment)
-    comb_equipment = combine_dicts(comb_equipment, money)
-    comb_equipment = combine_dicts(comb_equipment, weapons)
-    comb_equipment = combine_dicts(comb_equipment, encumbrance)
+    comb_equipment = {}
+    comb_equipment = {
+        **comb_equipment,
+        **nonenc_equipment,
+        **over_equipment,
+        **normal_equipment,
+        **money,
+        **weapons,
+        **encumbrance
+    }
 
     return comb_equipment
 
@@ -309,7 +314,7 @@ def get_weapons_and_stats(original_equipment_list, filename=None):
         i += 1
 
     for item in weapon_details:
-        weapondict = combine_dicts(weapondict, item)
+        weapondict = {**weapondict, **item}
 
     return weapondict
 
@@ -391,7 +396,7 @@ def create_spellsheet_pdf(details, name, filename=None, directory=None):
 
     spell_list = add_PDF_field_names(spell_list, 'Spell')
     for item in spell_details:
-        spell_list = combine_dicts(spell_list, item)
+        spell_list = {**spell_list, **item}
 
     if directory is None:
         directory = tempfile.TemporaryDirectory(dir=os.getcwd()).name

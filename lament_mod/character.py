@@ -59,7 +59,7 @@ class LotFPCharacter(object):
             self.attacks,
             self.AC]
         for item in reformatted:
-            self.details = tools.combine_dicts(self.details, item)
+            self.details = {**self.details, **item}
 
     def align(self, pcClass=None):
         alignment = None
