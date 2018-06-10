@@ -135,20 +135,18 @@ def subprocess_args(include_stdout=True):
 
 
 def fetch_character(pc_class=None):
+    """Fetch character data JSON from the remote generator."""
     with requests.session() as r:
         details = {'class': ""}
-        i = 1
         if pc_class:
             while details['class'] != pc_class:
                 try:
                     r = requests.get(CHARACTER_GEN_URL, timeout=10)
                     details = r.json()
-                    i += 1
                 except ConnectionError as e:
                     print("There was a connection error: %s" % e)
                 except TimeoutError as e:
                     print("The connection timed out: %s" % e)
-
         else:
             try:
                 r = requests.get(CHARACTER_GEN_URL, timeout=10)
@@ -157,6 +155,7 @@ def fetch_character(pc_class=None):
                 print("There was a connection error: %s" % e)
             except TimeoutError as e:
                 print("The connection timed out: %s" % e)
+
         return details
 
 
@@ -210,12 +209,13 @@ def format_equipment_list(details, calculate_encumbrance=True):
 
 
 def split_over(target, filename=None):
-    """Splitsoversized items from the equipment list and return both lists."""
+    """Split oversized items from the equipment list and return both lists."""
     over = []
     if filename is None:
         filename = OVERSIZED_ITEMS
-        with open(filename, 'r') as o:
-            oversized = o.read().splitlines()
+
+    with open(filename, 'r') as o:
+        oversized = o.read().splitlines()
 
     for item in target:
         if item in oversized:
@@ -232,8 +232,9 @@ def split_tiny(target, filename=None):
     non_enc = []
     if filename is None:
         filename = TINY_ITEMS
-        with open(filename, 'r') as t:
-            tiny = t.read().splitlines()
+
+    with open(filename, 'r') as t:
+        tiny = t.read().splitlines()
 
     for item in tiny:
         if item in target:
