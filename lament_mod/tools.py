@@ -295,36 +295,37 @@ def get_encumbrance(normal_items, oversized_items, pc_class):
     return encumbrance
 
 
-def get_weapons_and_stats(target, filename=None):
-    """Split weapons from equipment list, add stats, and return them.
-
-    A prime target for refactoring into several smaller functions.
-    """
+def get_weapons_and_stats(original_equipment_list, filename=None):
+    """Split weapons from equipment list, add stats, and return them."""
     weapondict = {}
-    listofdicts = get_item_details(target, 'Weapon', filename=None)
-
-    # Find ammo in equipment list and associate it with the correct weapon.
-    for weapon in listofdicts:
-        if weapon['Ammo'] == 'Yes':
-            for item in target:
-                arrows_index = item.find('Arrows')
-                if arrows_index is not -1:
-                    weapon['Ammo'] = item[arrows_index - 3:]
-        else:
-            weapon['Ammo'] = ""
+    weapon_details = get_item_details(original_equipment_list, 'Weapon', filename=None)
+    weapon_details = get_ammo(original_equipment_list, weapon_details)
 
     i = 0
-    for item in listofdicts:
+    for item in weapon_details:
         for name in WEAPON_FIELDS:
             prefix = name + str(i)
             item[prefix] = item[name]
             del item[name]
         i += 1
 
-    for item in listofdicts:
+    for item in weapon_details:
         weapondict = combine_dicts(weapondict, item)
 
     return weapondict
+
+
+def get_ammo(original_equipment_list, weapon_details):
+    """Find ammo in equipment list and associate it with the correct weapon."""
+    for weapon in weapon_details:
+        if weapon['Ammo'] == 'Yes':
+            for item in original_equipment_list:
+                arrows_index = item.find('Arrows')
+                if arrows_index is not -1:
+                    weapon['Ammo'] = item[arrows_index - 3:]
+        else:
+            weapon['Ammo'] = ""
+    return weapon_details
 
 
 def clear_mod_zeroes(modsdict):
