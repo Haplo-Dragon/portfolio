@@ -47,15 +47,6 @@ WEAPON_FIELDS = ['Weapon', 'Damage', 'Short', 'Medium', 'Long', 'Ammo']
 CHARACTER_GEN_URL = "http://character.totalpartykill.ca/lotfp/json"
 
 
-def combine_dicts(dict1, dict2):
-    """This method may be extraneous. Considering replacing it with
-    dictionary unpacking: new_dict = {**new_dict, **old_dict}.
-    """
-    combined = dict1.copy()
-    combined.update(dict2)
-    return combined
-
-
 def add_PDF_field_names(equiplist, type='NonEnc'):
     """Takes a list of items and their type and returns a dictionary with the items
      as values and the type followed by a sequential number (type0, type1, etc.) as
