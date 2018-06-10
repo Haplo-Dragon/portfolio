@@ -48,6 +48,9 @@ CHARACTER_GEN_URL = "http://character.totalpartykill.ca/lotfp/json"
 
 
 def combine_dicts(dict1, dict2):
+    """This method may be extraneous. Considering replacing it with
+    dictionary unpacking: new_dict = {**new_dict, **old_dict}.
+    """
     combined = dict1.copy()
     combined.update(dict2)
     return combined
@@ -57,7 +60,8 @@ def add_PDF_field_names(equiplist, type='NonEnc'):
     """Takes a list of items and their type and returns a dictionary with the items
      as values and the type followed by a sequential number (type0, type1, etc.) as
      keys. These are generally used to fill fields in a blank PDF, with keys
-     corresponding to field names."""
+     corresponding to field names.
+     """
     equipdict = {}
     for i in range(len(equiplist)):
         prefix = type + str(i)
@@ -92,7 +96,6 @@ def subprocess_args(include_stdout=True):
                               **subprocess_args(False))
     The following is true only on Windows.
     """
-
     if hasattr(subprocess, 'STARTUPINFO'):
         # On Windows, subprocess calls will pop up a command window by default
         # when run from Pyinstaller with the ``--noconsole`` option. Avoid this
@@ -157,16 +160,19 @@ def fetch_character(pc_class=None):
         return details
 
 
+# TODO: Refactor this huge mess of a function?
 def format_equipment_list(details, calculate_encumbrance=True):
     """
-    Splits the huge, unsorted equipment list provided by the remote
-    generator into logical bits. Duplicates the weapons and their
-    statistics to fill the weapons table on the character sheet.
-    Splits the non-encumbering, oversized, and normal items into their
-    own containers, removing them from the original equipment list.
-    Splits the money from the original equipment list.
-    Generates an encumbrance value with the split equipment.
-    Combines all of the separated and sorted equipment dictionaries into one.
+    Split the huge, unsorted equipment list provided by the remote
+    generator into logical bits.
+
+    Duplicates the weapons and their statistics to fill the weapons table
+    on the character sheet. Splits the non-encumbering, oversized, and normal
+    items into their own containers, removing them from the original equipment
+    list. Splits the money from the original equipment list. Generates an
+    encumbrance value with the split equipment. Combines all of the separated
+    and sorted equipment dictionaries into one.
+
     :param details: The details of the character - easily obtained from the
     JSON remote generator.
     :return: The combined and sorted equipment, weapons with stats,
@@ -204,6 +210,7 @@ def format_equipment_list(details, calculate_encumbrance=True):
 
 
 def split_over(target, filename=None):
+    """Splitsoversized items from the equipment list and return both lists."""
     over = []
     if filename is None:
         filename = OVERSIZED_ITEMS
@@ -221,6 +228,7 @@ def split_over(target, filename=None):
 
 
 def split_tiny(target, filename=None):
+    """Split non-encumbering items from the equipment list and return both lists."""
     non_enc = []
     if filename is None:
         filename = TINY_ITEMS
@@ -238,6 +246,7 @@ def split_tiny(target, filename=None):
 
 
 def split_money(target):
+    """Split money from the equipment list and return both lists."""
     money = {}
     for item in target:
         cp_index = item.find(' Cp')
@@ -258,7 +267,8 @@ def get_encumbrance(normal_items, oversized_items, pc_class):
     Encumbrance is calculated from number of items carried, in multiples of 5.
     0-5 items is 0 encumbrance, 6-10 is 1 encumbrance, 11-16 is 2 encumbrance,
     etc. This is why we're taking the whole number result of a division
-    by 5.1 — it goes up by one after each multiple of 5."""
+    by 5.1 — it goes up by one after each multiple of 5.
+    """
     encumbrance = int(len(normal_items) / 5.1)
 
     # Check for chain or plate armor that would add extra encumbrance
@@ -285,6 +295,10 @@ def get_encumbrance(normal_items, oversized_items, pc_class):
 
 
 def get_weapons_and_stats(target, filename=None):
+    """Split weapons from equipment list, add stats, and return them.
+
+    A prime target for refactoring into several smaller functions.
+    """
     weapondict = {}
     listofdicts = []
 
@@ -322,6 +336,7 @@ def get_weapons_and_stats(target, filename=None):
 
 
 def clear_mod_zeroes(modsdict):
+    """Clear zeroes from dictionary of attributes and modifiers."""
     for item in modsdict.keys():
         if modsdict[item] == '0':
             modsdict[item] = ""
@@ -329,6 +344,7 @@ def clear_mod_zeroes(modsdict):
 
 
 def add_class_based_spells(spell_list, pc_class):
+    """Add class-specific spells to the spell list."""
     if pc_class == 'Magic-User':
         spell_list.append('Summon')
     if pc_class == 'Cleric':
@@ -341,7 +357,8 @@ def add_class_based_spells(spell_list, pc_class):
 def get_spell_details(spell_list, filename=None):
     """Create a list of dictionaries containing spell names, details, and flavor
     text for spell_list, drawn from the file specified or from the default
-    file defined in LEVEL_ONE_SPELLS."""
+    file defined in LEVEL_ONE_SPELLS.
+    """
     spell_details = []
     if filename is None:
         filename = LEVEL_ONE_SPELLS
@@ -355,15 +372,20 @@ def get_spell_details(spell_list, filename=None):
     return spell_details
 
 
-def create_spellsheet_pdf(details, name, filename=None, directory=None):
-    spell_list = details['spell']
-    spell_list = add_class_based_spells(spell_list, details['class'])
+def create_spell_list(original_spell_list, pcClass):
+    """Create a full list of spells, including class-specific spells."""
+    spell_list = add_class_based_spells(original_spell_list, pcClass)
 
     # Correct for spelling error in Magic Missile
     if 'Magic Missle' in spell_list:
         spell_list.remove('Magic Missle')
         spell_list.append('Magic Missile')
+    return spell_list
 
+
+def create_spellsheet_pdf(details, name, filename=None, directory=None):
+    """Get spell list for character, fill spell sheet PDF with spell information."""
+    spell_list = create_spell_list(details['spell'], details['class'])
     spell_details = get_spell_details(spell_list, filename=None)
 
     i = 0
