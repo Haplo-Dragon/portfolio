@@ -163,11 +163,11 @@ def fetch_character(pc_class=None):
 def format_equipment_list(details, calculate_encumbrance=True):
     """
     Split the huge, unsorted equipment list provided by the remote
-    generator into logical bits.
+    generator into logical bits, sort, prefix, and return it.
 
-    Duplicates the weapons and their statistics to fill the weapons table
-    on the character sheet. Splits the non-encumbering, oversized, and normal
-    items into their own containers, removing them from the original equipment
+    Duplicates the weapons and their statistics (once to fill the weapons table
+    and again for the items carried list). Splits the non-encumbering, oversized,
+    and normal items into their own containers, removing them from the original equipment
     list. Splits the money from the original equipment list. Generates an
     encumbrance value with the split equipment. Combines all of the separated
     and sorted equipment dictionaries into one.
@@ -175,7 +175,7 @@ def format_equipment_list(details, calculate_encumbrance=True):
     :param details: The details of the character - easily obtained from the
     JSON remote generator.
     :return: The combined and sorted equipment, weapons with stats,
-    encumbrance.
+    and encumbrance, prefixed with the proper PDF field names.
     """
     # Get a list of equipment (including money and weapons)
     equipment = details['equipment']
