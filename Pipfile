@@ -12,6 +12,7 @@ gunicorn = "*"
 flask-scss = "*"
 requests = "*"
 fdfgen = "*"
+"pypdf2" = "*"
 
 
 [dev-packages]
