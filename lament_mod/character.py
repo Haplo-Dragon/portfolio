@@ -11,7 +11,7 @@ class LotFPCharacter(object):
         self.counter = counter
         self.pcClass = self.details['class']
 
-        self.name = ' - '.join([str(self.counter + 1), self.pcClass])
+        self.name = '_'.join([str(self.counter + 1), self.pcClass])
         self.fdf_name = self.name + '.fdf'
         self.filled_name = self.name + '_Filled.pdf'
 
