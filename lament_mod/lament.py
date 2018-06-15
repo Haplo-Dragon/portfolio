@@ -29,6 +29,10 @@ ERROR_MESSAGES = {
     'ZERO': """There you go! I generated NO characters for you,
       just like you asked."""}
 
+FILLABLE_CHARACTER_SHEET = os.path.join(
+    os.path.dirname(__file__),
+    'LotFPCharacterSheetLastGaspFillable.pdf')
+
 lamentApp = Blueprint('lament', __name__)
 
 
@@ -40,7 +44,7 @@ def index():
 @lamentApp.route('/lament', methods=['GET', 'POST'])
 def lament_pdf():
     path_to_pdftk = tools.get_pdftk_path()
-    tmpdir = tempfile.TemporaryDirectory(dir=os.path.dirname(__file__))
+    tmpdir = tempfile.TemporaryDirectory(dir=os.getcwd())
     calculate_encumbrance = True
 
     if "desired_class" in request.form.keys():
@@ -97,7 +101,7 @@ def lament_pdf():
         # All of the command-line arguments for PDFtk,
         # since they were getting kinda long.
         args = [path_to_pdftk,
-                '..\LotFPCharacterSheetLastGaspFillable.pdf',
+                FILLABLE_CHARACTER_SHEET,
                 'fill_form',
                 PC.fdf_name,
                 'output',

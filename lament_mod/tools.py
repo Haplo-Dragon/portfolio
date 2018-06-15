@@ -38,6 +38,10 @@ CLERIC_SPELLS = [
     'Invisibility to Undead', 'Protection from Evil',
     'Purify Food & Drink', 'Remove Fear', 'Sanctuary', 'Turn Undead']
 
+FILLABLE_SPELL_SHEET = os.path.join(
+    os.path.dirname(__file__),
+    'LotFPSpellSheetFillable.pdf')
+
 SPELL_FIELDS = [
     'Spell', 'Duration', 'Range', 'Save',
     'Reversible', 'Effect', 'Flavor', 'Page']
@@ -392,8 +396,8 @@ def create_spellsheet_pdf(details, PC_name, filename=None, directory=None):
     if directory is None:
         directory = tempfile.TemporaryDirectory(dir=os.getcwd()).name
 
-    spell_name = PC_name + ' Spells.pdf'
-    spell_fdf_name = PC_name + ' Spells.fdf'
+    spell_name = PC_name + '_Spells.pdf'
+    spell_fdf_name = PC_name + '_Spells.fdf'
 
     fdf_spell_data = forge_fdf("", spell_list, [], [], [])
     with open(os.path.join(directory, spell_fdf_name), 'wb') as f:
@@ -402,7 +406,7 @@ def create_spellsheet_pdf(details, PC_name, filename=None, directory=None):
     path_to_pdftk = get_pdftk_path()
 
     args = [path_to_pdftk,
-            '..\LotFPSpellSheetFillable.pdf',
+            FILLABLE_SPELL_SHEET,
             'fill_form',
             spell_fdf_name,
             'output',
