@@ -49,7 +49,6 @@ def test_split_over_and_tiny(filename, prefix, does_not_belong, splitter):
     assert does_not_belong in to_be_split
 
 
-# TODO: Figure out why this is failing.
 @pytest.mark.parametrize("money", ["1 sp 11 Cp", "1 Cp"])
 def test_split_money(money):
     """Are we splitting money from a list and returning two lists?"""
