@@ -254,6 +254,7 @@ def split_money(target):
         if (cp_index is not -1) and (sp_index is not -1):
             money['cp'] = item[item.find(' Cp') - 2:]
             money['sp'] = item[:item.find(' sp') + 3]
+            target.remove(item)
         elif cp_index is not -1:
             money['cp'] = item[cp_index - 1]
             target.remove(item)
