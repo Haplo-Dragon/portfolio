@@ -60,3 +60,13 @@ def test_split_money(money):
         assert ' sp' not in item
     for item in money:
         assert item.find(' Cp') or item.find(' sp')
+
+
+def test_get_encumbrance(normal_equipment, oversized_equipment):
+    """Is encumbrance calculated correctly for normal and oversized items?"""
+    encumbrance = tools.get_encumbrance(
+        normal_equipment,
+        oversized_equipment,
+        pc_class="Dwarf")
+    assert encumbrance >= 0
+    assert encumbrance == 5
