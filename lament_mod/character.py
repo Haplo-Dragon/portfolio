@@ -66,9 +66,9 @@ class LotFPCharacter(object):
 
     def align(self, pcClass=None):
         alignment = None
-        if pcClass == 'Cleric':
+        if pcClass.casefold() == 'Cleric'.casefold():
             alignment = 'Lawful'
-        if pcClass in ('Magic-User', 'Elf'):
+        if pcClass.casefold() in ('Magic-User'.casefold(), 'Elf'.casefold()):
             alignment = 'Chaotic'
 
         return alignment
