@@ -48,6 +48,7 @@ def lament_pdf():
     path_to_pdftk = tools.get_pdftk_path()
     tmpdir = tempfile.TemporaryDirectory(dir=os.getcwd())
     calculate_encumbrance = True
+    desired_level = request.form['desired_level']
 
     if "desired_class" in request.form.keys():
         desired_class = request.form['desired_class']

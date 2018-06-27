@@ -2,14 +2,38 @@
 
 {% block title %} {{sass}} {% endblock %}
 
+{%block scripts %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        $( document ).ready(function() {
+            // Any time the level dropdown changes, we want to update the two hidden input
+            // fields to match its value.
+            $('#level').change(function() {
+                $('#spec_level').val($('#level option:selected').val());
+                $('#rand_level').val($('#level option:selected').val());                
+            });
+        });
+    </script>
+{% endblock %}
+
 {%block content %}
+
+<div class="level">
+    <h1>What level would you like your character(s) to be?</h1>
+    <select id="level" name="desired_level" class="level_dropdown">
+        {% for level in range(20) %}
+            <option value={{ level + 1 }}>{{level + 1 }}</option>
+        {% endfor %}        
+    </select>    
+</div>
 
 <div id="specific">
     <h1>Generate a specific class</h1>
 </div>
 
 <div id="classlist">
-    <form id="specific-classes" class="specific" method="POST" action="{{ url_for('lament.lament_pdf') }}">
+    <form id="specific-classes" class="specific" method="POST" action="{{ url_for('lament.lament_pdf') }}">        
+        <input type="hidden" id="spec_level" name="desired_level">
         <input type="submit" class="specificclass" name="desired_class" value="Cleric">
         <input type="submit" class="specificclass" name="desired_class" value="Fighter">
         <input type="submit" class="specificclass" name="desired_class" value="Magic-User">
@@ -22,7 +46,8 @@
 </div>
 <h1>Generate random characters</h1>
 <div id="random">
-    <form id="random-classes" class="random" method="POST" action="{{ url_for('lament.lament_pdf') }}">
+    <form id="random-classes" class="random" method="POST" action="{{ url_for('lament.lament_pdf') }}">                
+        <input type="hidden" id="rand_level" name="desired_level">
         <input type="text" id="randos" name="randos" autofocus="autofocus" placeholder="How many randos?">
         {% if get_flashed_messages() %}
             <div class="flash">
