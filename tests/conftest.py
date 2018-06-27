@@ -1,5 +1,7 @@
 import pytest
+import json
 import ethan_portfolio
+import lament_mod.character as character
 
 
 @pytest.fixture
@@ -35,3 +37,11 @@ def oversized_equipment():
         "Over0": "Marvin",
         "Over1": "Infinite Improbability Drive",
         "Over2": "Krikkit bat"}
+
+
+@pytest.fixture
+def halfling(mocker):
+    mock_fetch = mocker.patch('lament_mod.lament.tools.fetch_character')
+    with open('tests/mocked_fetch_character.json', 'r') as f:
+        mock_fetch.return_value = json.load(f)
+    return character.LotFPCharacter()
