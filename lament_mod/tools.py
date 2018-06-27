@@ -273,10 +273,15 @@ def get_encumbrance(normal_items, oversized_items, pc_class):
     encumbrance = int(len(normal_items) / 5.1)
 
     # Check for chain or plate armor that would add extra encumbrance
-    if 'Chain Armor' in normal_items.values():
-        encumbrance += 1
-    if 'Plate Armor' in normal_items.values():
-        encumbrance += 2
+    for item in normal_items.values():
+        if 'Chain Armor'.casefold() in item.casefold():
+            encumbrance += 1
+        if 'Plate Armor'.casefold() in item.casefold():
+            encumbrance += 2
+    # if 'Chain Armor' in normal_items.values():
+    #     encumbrance += 1
+    # if 'Plate Armor' in normal_items.values():
+    #     encumbrance += 2
 
     # Check for oversized items (shields, polearms, etc.).
     # Each oversized item adds an encumbrance point.
