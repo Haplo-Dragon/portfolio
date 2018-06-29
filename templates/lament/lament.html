@@ -6,11 +6,14 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
         $( document ).ready(function() {
-            // Any time the level dropdown changes, we want to update the two hidden input
-            // fields to match its value.
+            // When the page loads, we need to set the hidden input fields to the default.
+            $('#spec_level').val(1);
+            $('#rand_level').val(1);
+            // Then, any time the level dropdown changes, we want to update the two hidden
+            // input fields to match its value.
             $('#level').change(function() {
                 $('#spec_level').val($('#level option:selected').val());
-                $('#rand_level').val($('#level option:selected').val());                
+                $('#rand_level').val($('#level option:selected').val());
             });
         });
     </script>
@@ -21,7 +24,10 @@
 <div class="level">
     <h1>What level would you like your character(s) to be?</h1>
     <select id="level" name="desired_level" class="level_dropdown">
-        {% for level in range(20) %}
+        <!-- Default is generated manually so it can be selected when the page loads. -->
+        <option value="1" selected="selected">1</option>
+        <!-- Options 2 through 20 are generated programatically. -->
+        {% for level in range(1, 20) %}
             <option value={{ level + 1 }}>{{level + 1 }}</option>
         {% endfor %}        
     </select>    

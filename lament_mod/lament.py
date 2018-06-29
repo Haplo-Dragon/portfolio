@@ -48,7 +48,7 @@ def lament_pdf():
     path_to_pdftk = tools.get_pdftk_path()
     tmpdir = tempfile.TemporaryDirectory(dir=os.getcwd())
     calculate_encumbrance = True
-    desired_level = request.form['desired_level']
+    desired_level = int(request.form['desired_level'])
 
     if "desired_class" in request.form.keys():
         desired_class = request.form['desired_class']
@@ -85,7 +85,8 @@ def lament_pdf():
                 counter=i)
         else:
             PC = character.LotFPCharacter(
-                desired_level,
+                desired_class=None,
+                desired_level=desired_level,
                 calculate_encumbrance=calculate_encumbrance,
                 counter=i)
 
