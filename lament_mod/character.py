@@ -5,11 +5,13 @@ import random
 class LotFPCharacter(object):
     def __init__(self,
                  desired_class=None,
+                 desired_level=1,
                  calculate_encumbrance=True,
                  counter=1):
         self.details = tools.fetch_character(desired_class)
         self.counter = counter
         self.pcClass = self.details['class']
+        self.level = desired_level
 
         self.name = '_'.join([str(self.counter + 1), self.pcClass])
         self.fdf_name = self.name + '.fdf'
@@ -18,9 +20,9 @@ class LotFPCharacter(object):
         self.alignment = self.align(self.pcClass)
         self.attributes = {item[0]: item[1] for item in self.details['attributes']}
         self.mods = self.split_mods(self.details['attr'])
-        self.hp = self.get_hp(self.details, self.mods)
+        self.hp = self.get_hp(self.pcClass, self.mods)
         self.saves = self.get_saves(self.pcClass, self.mods)
-        self.skills = self.get_skills(self.details['skills'], self.mods)
+        self.skills = {item[0]: item[1] for item in self.details['skills']}
 
         self.calculate_encumbrance = calculate_encumbrance
         self.equipment = tools.format_equipment_list(
@@ -50,6 +52,7 @@ class LotFPCharacter(object):
 
         if self.alignment is not None:
             self.details['alignment'] = self.alignment
+        self.details['level'] = self.level
 
         # We've gotta replace the removed character detail entries
         # with our nice reformatted ones.
@@ -94,12 +97,11 @@ class LotFPCharacter(object):
 
         return dictofmods
 
-    def get_hp(self, details, mods):
+    def get_hp(self, pcClass, mods):
         """
         We're only generating our own hitpoints until the remote generator
         is fixed to use correct LotFP hitdice.
-        :param details: The details of the character - easily obtained
-        from the JSON remote generator.
+        :param pcClass: The character class of the character.
         :param mods: The attribute modifiers of the character.
         :return: The number of hit points the character has.
         """
@@ -121,9 +123,9 @@ class LotFPCharacter(object):
             'Elf': 4,
             'Halfling': 4
         }
-        hit_die = hitdice[details['class']]
+        hit_die = hitdice[pcClass]
         hp = random.randint(1, hit_die) + int(mods['CONmod'])
-        hp = max(hp, min_hp[details['class']])
+        hp = max(hp, min_hp[pcClass])
 
         return hp
 
@@ -154,10 +156,6 @@ class LotFPCharacter(object):
             saves[save] -= int(mods['WISmod'])
 
         return saves
-
-    def get_skills(self, skill_list, mods):
-        skills = {item[0]: item[1] for item in skill_list}
-        return skills
 
     def calculate_attack_bonuses(self, mods, pcClass=None):
         if pcClass == 'Fighter':
