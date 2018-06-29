@@ -60,6 +60,7 @@ class LotFPCharacter(object):
         self.hp = self.get_hp(self.pcClass, self.mods, self.level)
         self.saves = self.get_saves(self.pcClass, self.mods)
         self.skills = {item[0]: item[1] for item in self.details['skills']}
+        self.skill_points = 2 * (self.level - 1) if self.pcClass == "Specialist" else None
 
         self.calculate_encumbrance = calculate_encumbrance
         self.equipment = tools.format_equipment_list(
@@ -89,8 +90,10 @@ class LotFPCharacter(object):
 
         if self.alignment is not None:
             self.details['alignment'] = self.alignment
-        self.details['level'] = self.level
-        self.details['hp'] = self.hp
+        for field in ['level', 'hp', 'skill_points']:
+            self.details[field] = getattr(self, field)
+        # self.details['level'] = self.level
+        # self.details['hp'] = self.hp
 
         # We've gotta replace the removed character detail entries
         # with our nice reformatted ones.
