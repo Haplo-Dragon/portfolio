@@ -6,7 +6,17 @@ def test_lament_index(client):
     """Does the main page of Lament render properly?"""
     response = client.get('/character')
     assert response.status_code == 200
-    assert b'Fighter' in response.data
+    list_of_classes = [
+        'Fighter',
+        'Cleric',
+        'Magic-User',
+        'Specialist',
+        'Dwarf',
+        'Elf',
+        'Halfling']
+    for character_class in list_of_classes:
+        assert character_class.encode() in response.data
+    assert b'level' in response.data
 
 
 # Parametrizing allows us to test multiple bad inputs in one test without
