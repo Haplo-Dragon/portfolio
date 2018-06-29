@@ -80,10 +80,12 @@ def lament_pdf():
         if desired_class:
             PC = character.LotFPCharacter(
                 desired_class,
+                desired_level,
                 calculate_encumbrance=calculate_encumbrance,
                 counter=i)
         else:
             PC = character.LotFPCharacter(
+                desired_level,
                 calculate_encumbrance=calculate_encumbrance,
                 counter=i)
 

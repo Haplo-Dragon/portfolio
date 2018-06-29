@@ -21,7 +21,7 @@ def test_bad_data_entered_in_random_field(client, bad_input, expected_message):
     Many box?"""
     response = client.post(
         '/lament',
-        data={'randos': bad_input},
+        data={'randos': bad_input, 'desired_level': 1},
         follow_redirects=True)
     assert response.status_code == 200
     assert expected_message in response.data
@@ -34,7 +34,7 @@ def test_generating_over_20_characters(client, mocker):
         mock_fetch.return_value = json.load(f)
     response = client.post(
         '/lament',
-        data={'randos': 25},
+        data={'randos': 25, 'desired_level': 1},
         follow_redirects=True)
     assert response.status_code == 200
     # Ensure we're sending a PDF
