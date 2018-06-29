@@ -2,6 +2,43 @@ import lament_mod.tools as tools
 import random
 
 
+HIT_DICE = {
+    'Cleric': 6,
+    'Fighter': 8,
+    'Magic-User': 4,
+    'Specialist': 6,
+    'Dwarf': 10,
+    'Elf': 6,
+    'Halfling': 6}
+
+HIT_BONUSES = {
+    'Cleric': 2,
+    'Fighter': 3,
+    'Magic-User': 1,
+    'Specialist': 2,
+    'Dwarf': 3,
+    'Elf': 2,
+    'Halfling': 2}
+
+MIN_HP = {
+    'Cleric': 4,
+    'Fighter': 8,
+    'Magic-User': 3,
+    'Specialist': 4,
+    'Dwarf': 6,
+    'Elf': 4,
+    'Halfling': 4}
+
+LOTFP_SAVES = {
+    'Cleric': {'poison': 11, 'wands': 12, 'stone': 14, 'breath': 16, 'magic': 15},
+    'Fighter': {'poison': 12, 'wands': 13, 'stone': 14, 'breath': 15, 'magic': 16},
+    'Magic-User': {'poison': 13, 'wands': 13, 'stone': 13, 'breath': 16, 'magic': 14},
+    'Specialist': {'poison': 16, 'wands': 14, 'stone': 14, 'breath': 15, 'magic': 14},
+    'Dwarf': {'poison': 8, 'wands': 9, 'stone': 10, 'breath': 13, 'magic': 12},
+    'Elf': {'poison': 12, 'wands': 13, 'stone': 13, 'breath': 15, 'magic': 15},
+    'Halfling': {'poison': 8, 'wands': 9, 'stone': 10, 'breath': 13, 'magic': 12}}
+
+
 class LotFPCharacter(object):
     def __init__(self,
                  desired_class=None,
@@ -20,7 +57,7 @@ class LotFPCharacter(object):
         self.alignment = self.align(self.pcClass)
         self.attributes = {item[0]: item[1] for item in self.details['attributes']}
         self.mods = self.split_mods(self.details['attr'])
-        self.hp = self.get_hp(self.pcClass, self.mods)
+        self.hp = self.get_hp(self.pcClass, self.mods, self.level)
         self.saves = self.get_saves(self.pcClass, self.mods)
         self.skills = {item[0]: item[1] for item in self.details['skills']}
 
@@ -53,6 +90,7 @@ class LotFPCharacter(object):
         if self.alignment is not None:
             self.details['alignment'] = self.alignment
         self.details['level'] = self.level
+        self.details['hp'] = self.hp
 
         # We've gotta replace the removed character detail entries
         # with our nice reformatted ones.
@@ -97,37 +135,44 @@ class LotFPCharacter(object):
 
         return dictofmods
 
-    def get_hp(self, pcClass, mods):
+    def get_hp(self, pcClass, mods, level, hp=0):
         """
         We're only generating our own hitpoints until the remote generator
         is fixed to use correct LotFP hitdice.
         :param pcClass: The character class of the character.
         :param mods: The attribute modifiers of the character.
+        :param level: The desired level of the character.
+        :param hp: The current hit points of the character (defaults to 0).
         :return: The number of hit points the character has.
         """
-        hitdice = {
-            'Cleric': 6,
-            'Fighter': 8,
-            'Magic-User': 6,
-            'Specialist': 6,
-            'Dwarf': 10,
-            'Elf': 6,
-            'Halfling': 6
-        }
-        min_hp = {
-            'Cleric': 4,
-            'Fighter': 8,
-            'Magic-User': 3,
-            'Specialist': 4,
-            'Dwarf': 6,
-            'Elf': 4,
-            'Halfling': 4
-        }
-        hit_die = hitdice[pcClass]
-        hp = random.randint(1, hit_die) + int(mods['CONmod'])
-        hp = max(hp, min_hp[pcClass])
+        hit_die = HIT_DICE[pcClass]
+        hit_bonus = HIT_BONUSES[pcClass]
 
-        return hp
+        if level < 10:
+            # Roll hitdice for all levels other than level 1...
+            for i in range(level - 1):
+                hp += random.randint(1, hit_die) + int(mods['CONmod'])
+
+            # ...account for the irritating fact that Magic-Users (and ONLY Magic-Users)
+            # have a d6 hit die at first level and a d4 at 2nd level and up...
+            if pcClass.casefold() in "Magic-User".casefold():
+                hit_die = 6
+            # ...then add the final roll for level 1 or the minimum HP for the class,
+            # whichever is higher.
+            hp += max(random.randint(1, hit_die) + int(mods['CONmod']), MIN_HP[pcClass])
+
+            return hp
+
+        if level >= 10:
+            # Add the hit point bonus once for each level past 9.
+            hp += hit_bonus * (level - 9)
+
+            # Dwarves keep adding their CON bonus even after level 10. No one else does.
+            if pcClass.casefold() in "Dwarf".casefold():
+                hp += int(mods['CONmod']) * (level - 9)
+
+            # Recursively call this function for all the levels from 9 down
+            return self.get_hp(pcClass, mods, 9, hp)
 
     def get_saves(self, pcClass, mods):
         """
@@ -138,16 +183,7 @@ class LotFPCharacter(object):
         :param mods: The attribute modifiers of the character.
         :return: A dictionary of saves in the form 'poison': 12.
         """
-        lotfp_saves = {
-            'Cleric': {'poison': 11, 'wands': 12, 'stone': 14, 'breath': 16, 'magic': 15,},
-            'Fighter': {'poison': 12, 'wands': 13, 'stone': 14, 'breath': 15, 'magic': 16},
-            'Magic-User': {'poison': 13, 'wands': 13, 'stone': 13, 'breath': 16, 'magic': 14},
-            'Specialist': {'poison': 16, 'wands': 14, 'stone': 14, 'breath': 15, 'magic': 14},
-            'Dwarf': {'poison': 8, 'wands': 9, 'stone': 10, 'breath': 13, 'magic': 12},
-            'Elf': {'poison': 12, 'wands': 13, 'stone': 13, 'breath': 15, 'magic': 15},
-            'Halfling': {'poison': 8, 'wands': 9, 'stone': 10, 'breath': 13, 'magic': 12}
-        }
-        saves = lotfp_saves[pcClass]
+        saves = LOTFP_SAVES[pcClass]
 
         # We're SUBTRACTING the mod from the save because you
         # have to roll over to save. A LOWER save is better.
