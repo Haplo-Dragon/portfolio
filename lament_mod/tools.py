@@ -410,7 +410,7 @@ def list_number_of_random_spells_by_level(spells_to_be_added, level):
     return list_number_of_random_spells_by_level(spells_to_be_added, level - 1)
 
 
-def get_magic_notes(pcClass, level, spell_slots):
+def get_magic_notes(pcClass, level, highest_spell_level):
     """Generate notes about spell levels and random spells that must be chosen.
 
     Clerics have access to all spells of their level or lower, while Magic-Users
@@ -418,7 +418,6 @@ def get_magic_notes(pcClass, level, spell_slots):
     So a Magic-User above level 1 must add random spells, but can choose which
     level those random spells come from.
     """
-    highest_spell_level = len(spell_slots)
     notes = ""
 
     if pcClass.casefold() == "Cleric".casefold():
@@ -471,7 +470,7 @@ def create_spellsheet_pdf(details, PC_name, filename=None, directory=None):
     spell_list['MagicNotes'] = get_magic_notes(
         details['class'],
         details['level'],
-        spell_slots)
+        len(spell_slots))
 
     if directory is None:
         directory = tempfile.TemporaryDirectory(dir=os.getcwd()).name
