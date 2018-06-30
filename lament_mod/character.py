@@ -153,8 +153,10 @@ class LotFPCharacter(object):
 
         if level < 10:
             # Roll hitdice for all levels other than level 1...
+            # Assuming the minimum you can gain is 1 HP, although it isn't explicitly
+            # stated in the rulebook.
             for i in range(level - 1):
-                hp += random.randint(1, hit_die) + int(mods['CONmod'])
+                hp += max(random.randint(1, hit_die) + int(mods['CONmod']), 1)
 
             # ...account for the irritating fact that Magic-Users (and ONLY Magic-Users)
             # have a d6 hit die at first level and a d4 at 2nd level and up...
