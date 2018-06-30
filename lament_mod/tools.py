@@ -341,12 +341,12 @@ def clear_mod_zeroes(modsdict):
     return modsdict
 
 
-def add_class_based_spells(spell_list, pc_class):
+def add_class_based_spells(spell_list, pc_class, level):
     """Add class-specific spells to the spell list."""
     if pc_class == 'Magic-User':
         spell_list.append('Summon')
     if pc_class == 'Cleric':
-        spell_list = CLERIC_SPELLS
+        spell_list = CLERIC_SPELLS if level < 2 else None
     if pc_class == 'Elf':
         spell_list = ['Read Magic']
     return spell_list
@@ -371,9 +371,9 @@ def get_item_details(original_item_list, item_type, filename=None):
     return item_details
 
 
-def create_spell_list(original_spell_list, pcClass):
+def create_spell_list(original_spell_list, pcClass, level):
     """Create a full list of spells, including class-specific spells."""
-    spell_list = add_class_based_spells(original_spell_list, pcClass)
+    spell_list = add_class_based_spells(original_spell_list, pcClass, level)
 
     # Correct for spelling error in Magic Missile
     if 'Magic Missle' in spell_list:
@@ -384,7 +384,7 @@ def create_spell_list(original_spell_list, pcClass):
 
 def create_spellsheet_pdf(details, PC_name, filename=None, directory=None):
     """Get spell list for character, fill spell sheet PDF with spell information."""
-    spell_list = create_spell_list(details['spell'], details['class'])
+    spell_list = create_spell_list(details['spell'], details['class'], details['level'])
     spell_details = get_item_details(spell_list, 'Spell', filename=None)
 
     i = 0
