@@ -29,7 +29,7 @@ def test_clear_mod_zeroes(modifiers):
     ('Cleric', 'Bless'),
     ('Elf', 'Read Magic')])
 def test_add_class_based_spells(pcClass, expected):
-    spell_list = tools.add_class_based_spells([], pcClass)
+    spell_list = tools.add_class_based_spells([], pcClass, level=1)
     assert expected in spell_list
 
 
