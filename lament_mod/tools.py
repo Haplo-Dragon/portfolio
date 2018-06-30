@@ -399,6 +399,8 @@ def list_number_of_random_spells_by_level(spells_to_be_added, level):
     rejected in favor of current VERY REASONABLE function name.
     """
     current_highest_spell_level = min(math.ceil(level / 2), 9)
+    if level < 2:
+        return
     if level == 2:
         spells_to_be_added[0] += 1
         return spells_to_be_added
