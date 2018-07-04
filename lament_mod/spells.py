@@ -13,6 +13,7 @@ CLERIC_SPELLS = [
     'Purify Food & Drink', 'Remove Fear', 'Sanctuary', 'Turn Undead']
 
 MU_SPELL_SLOTS = [1, 2,2,2, 3,3,3, 4,4,4, 5,5,5, 6,6,6, 7,7,7, 8]
+CLERIC_SPELL_SLOTS = [1, 2, 3,3,3,3, 4,4,4,4, 5,5,5,5, 6,6,6,6, 7, 8]
 
 MU_SPELL_NOTES = "You must add random spells as follows:\n\n"
 CLERIC_SPELL_NOTES = "You have access to all Cleric spells of level {} or lower."
@@ -31,7 +32,7 @@ def add_class_based_spells(spell_list, pc_class, level):
     if pc_class == 'Magic-User':
         spell_list.append('Summon')
     if pc_class == 'Cleric':
-        spell_list = CLERIC_SPELLS if level < 2 else None
+        spell_list = CLERIC_SPELLS if level < 2 else []
     if pc_class == 'Elf':
         spell_list = ['Read Magic']
     return spell_list
@@ -62,8 +63,27 @@ def get_spell_slots(pcClass, level):
             spell_slots.append(MU_SPELL_SLOTS[(level - 1) - (2 * i)])
 
     if pcClass.casefold() == "Cleric".casefold():
-        pass
+        # Cleric spell slots are a little strange: they have access to level 1 spells
+        # if they're 3rd level or lower. Otherwise, they use the same progression as
+        # magic-users (except that Clerics' highest spell level is 7, not 9).
+        highest_spell_level = 1 if level <= 3 else min(math.ceil(level / 2), 7)
 
+        # Here's the really painful bit. Cleric spell slots ALMOST follow the nice easy
+        # Magic-User pattern of moving two steps down each time you go up a spell level.
+        # Almost.
+        # They actually move 3 steps down the first time (from spell level 1 to spell
+        # level 2), and then a nice even 2 steps down for every spell level after that.
+        # Special cases, UGH.
+        for i in range(highest_spell_level):
+            if i <= 1:
+                spell_slots.append(CLERIC_SPELL_SLOTS[(level - 1) - (3 * i)])
+            else:
+                spell_slots.append(CLERIC_SPELL_SLOTS[(level - 1) - (2 * i)])
+
+    # Sigh. Level 20 is a special case that doesn't follow any handy pattern that I
+    # could find.
+    if level == 20:
+        spell_slots = [8, 7, 7, 6, 5, 5, 4]
     print("\n\nThis character's spell slots are:\n", spell_slots, "\n\n")
     return spell_slots
 
