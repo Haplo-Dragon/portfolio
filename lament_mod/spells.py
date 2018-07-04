@@ -12,6 +12,8 @@ CLERIC_SPELLS = [
     'Invisibility to Undead', 'Protection from Evil',
     'Purify Food & Drink', 'Remove Fear', 'Sanctuary', 'Turn Undead']
 
+MU_SPELL_SLOTS = [1, 2,2,2, 3,3,3, 4,4,4, 5,5,5, 6,6,6, 7,7,7, 8]
+
 MU_SPELL_NOTES = "You must add random spells as follows:\n\n"
 CLERIC_SPELL_NOTES = "You have access to all Cleric spells of level {} or lower."
 
@@ -48,9 +50,22 @@ def create_spell_list(original_spell_list, pcClass, level):
 
 def get_spell_slots(pcClass, level):
     """Return a list containing the available spell slots for each spell level."""
-    # raise NotImplementedError
-    # return
-    pass
+    spell_slots = []
+
+    if pcClass.casefold() == "Magic-User".casefold():
+        highest_spell_level = min(math.ceil(level / 2), 9)
+        # MU_SPELL_SLOTS[level - 1] gives first level spell slots for the given character
+        # level. The spell slots for subsequent spell levels move two steps down the
+        # list each time. So we move two steps down the list for each spell level we
+        # need beyond the first by subtracting 2 * i from the index.
+        for i in range(highest_spell_level):
+            spell_slots.append(MU_SPELL_SLOTS[(level - 1) - (2 * i)])
+
+    if pcClass.casefold() == "Cleric".casefold():
+        pass
+
+    print("\n\nThis character's spell slots are:\n", spell_slots, "\n\n")
+    return spell_slots
 
 
 def list_number_of_random_spells_by_level(spells_to_be_added, level):
@@ -113,8 +128,7 @@ def create_spellsheet_pdf(details, PC_name, filename=None, directory=None):
     """Get spell list for character, fill spell sheet PDF with spell information."""
     spell_list = create_spell_list(details['spell'], details['class'], details['level'])
     spell_details = tools.get_item_details(spell_list, 'Spell', filename=None)
-    # spell_slots = get_spell_slots(details['class'], details['level'])
-    spell_slots = [3, 2, 2]
+    spell_slots = get_spell_slots(details['class'], details['level'])
 
     i = 0
     for item in spell_details:
