@@ -1,6 +1,9 @@
-import lament_mod.tools as tools
 import random
+import math
+import lament_mod.tools as tools
 
+
+NON_HUMANS = ["Dwarf".casefold(), "Elf".casefold(), "Halfling".casefold()]
 
 HIT_DICE = {
     'Cleric': 6,
@@ -60,6 +63,8 @@ class LotFPCharacter(object):
         self.hp = self.get_hp(self.pcClass, self.mods, self.level)
         self.saves = self.get_saves(self.pcClass, self.mods)
         self.skills = {item[0]: item[1] for item in self.details['skills']}
+        if self.pcClass.casefold() in NON_HUMANS and self.level > 1:
+            self.skills = self.get_nonhuman_skills(self.pcClass, self.skills, self.level)
         self.skill_points = 2 * (self.level - 1) if self.pcClass == "Specialist" else None
 
         self.calculate_encumbrance = calculate_encumbrance
@@ -197,6 +202,16 @@ class LotFPCharacter(object):
             saves[save] -= int(mods['WISmod'])
 
         return saves
+
+    def get_nonhuman_skills(self, pcClass, skills, level):
+        if pcClass.casefold() == "Dwarf".casefold() and "Architecture" in skills:
+            skills['Architecture'] = min(2 + math.ceil(level / 3), 6)
+        if pcClass.casefold() == "Elf".casefold() and "Search" in skills:
+            skills['Search'] = min(1 + math.ceil(level / 3), 6)
+        if pcClass.casefold() == "Halfling".casefold() and "Bushcraft" in skills:
+            skills['Bushcraft'] = min(2 + math.ceil(level / 3), 6)
+
+        return skills
 
     def calculate_attack_bonuses(self, mods, pcClass=None):
         if pcClass == 'Fighter':
