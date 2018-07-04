@@ -1,5 +1,6 @@
 import random
 import math
+import numpy as np
 import lament_mod.tools as tools
 
 
@@ -41,6 +42,35 @@ LOTFP_SAVES = {
     'Elf': {'poison': 12, 'wands': 13, 'stone': 13, 'breath': 15, 'magic': 15},
     'Halfling': {'poison': 8, 'wands': 9, 'stone': 10, 'breath': 13, 'magic': 12}}
 
+# These correspond to Paralyze, Poison, Breath, Device, and Magic in the LotFP rules.
+# The names are different to maintain compatibility with the remote generator.
+SAVE_NAMES = ['stone', 'poison', 'breath', 'wands', 'magic']
+
+# This is how often the saves change. As in, the saves change every X levels, and this
+# is X.
+SAVE_CHANGE_INTERVALS = {'Cleric': 4, 'Fighter': 3, 'Specialist': 4}
+
+NEW_SAVES = {
+    'Cleric': np.array(
+        [[14, 11, 16, 12, 15],
+         [-2, -2, -2, -2, -3],
+         [-2, -2, -2, -2, -3],
+         [-2, -4, -4, -4, -3],
+         [-2, -1, -2, 0, -1]]),
+    'Fighter': np.array(
+        [[14, 12, 15, 13, 16],
+         [-2, -2, -2, -2, -2],
+         [-2, -2, -4, -2, -2],
+         [-2, -2, -2, -2, -2],
+         [-2, -2, -2, -2, -2]]),
+    'Specialist': np.array(
+        [[14, 16, 15, 14, 14],
+         [-3, -4, -1, -1, -2],
+         [-2, -2, -2, -2, -2],
+         [-2, -2, -2, -2, -2],
+         [-2, -2, -2, -2, -2]])
+}
+
 
 class LotFPCharacter(object):
     def __init__(self,
@@ -61,7 +91,7 @@ class LotFPCharacter(object):
         self.attributes = {item[0]: item[1] for item in self.details['attributes']}
         self.mods = self.split_mods(self.details['attr'])
         self.hp = self.get_hp(self.pcClass, self.mods, self.level)
-        self.saves = self.get_saves(self.pcClass, self.mods)
+        self.saves = self.get_saves(self.pcClass, self.level, self.mods)
         self.skills = {item[0]: item[1] for item in self.details['skills']}
         if self.pcClass.casefold() in NON_HUMANS and self.level > 1:
             self.skills = self.get_nonhuman_skills(self.pcClass, self.skills, self.level)
@@ -184,7 +214,7 @@ class LotFPCharacter(object):
             # Recursively call this function for all the levels from 9 down
             return self.get_hp(pcClass, mods, 9, hp)
 
-    def get_saves(self, pcClass, mods):
+    def get_saves(self, pcClass, level, mods):
         """
         We're only generating our own saves until the remote generator\
         is fixed to return the right LotFP saves.
@@ -194,6 +224,15 @@ class LotFPCharacter(object):
         :return: A dictionary of saves in the form 'poison': 12.
         """
         saves = LOTFP_SAVES[pcClass]
+
+        if pcClass.casefold() in [
+                "Cleric".casefold(),
+                "Fighter".casefold(),
+                "Specialist".casefold()]:
+            interval = SAVE_CHANGE_INTERVALS[pcClass]
+
+            changes_to_saves = NEW_SAVES[pcClass][:math.ceil(level / interval)].sum(0)
+            saves = dict(zip(SAVE_NAMES, changes_to_saves.flat))
 
         # We're SUBTRACTING the mod from the save because you
         # have to roll over to save. A LOWER save is better.
