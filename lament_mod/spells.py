@@ -112,6 +112,10 @@ def get_magic_notes(pcClass, level, highest_spell_level):
     get a new random spell of any level they can cast each time they level up.
     So a Magic-User above level 1 must add random spells, but can choose which
     level those random spells come from.
+    I think Elves are SUPPOSED to have the same spell slot progression as Magic-Users,
+    but in the book as written their progression is VERY SLIGHTLY different. I'm leaving
+    Elves' spell slots out of Lament until I can contact Raggi or someone to figure out
+    if they're a mistake or not.
     """
     notes = ""
 
