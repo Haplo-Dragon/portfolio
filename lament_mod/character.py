@@ -104,6 +104,8 @@ LOTFP_SAVES = {
          [-2, 0, -2, -1, -2]])
 }
 
+SKILL_POINTS_TO_SPEND = "You have {} skill points to spend."
+
 
 class LotFPCharacter(object):
     def __init__(self,
@@ -158,10 +160,10 @@ class LotFPCharacter(object):
 
         if self.alignment is not None:
             self.details['alignment'] = self.alignment
-        for field in ['level', 'hp', 'skill_points']:
+        for field in ['level', 'hp']:
             self.details[field] = getattr(self, field)
-        # self.details['level'] = self.level
-        # self.details['hp'] = self.hp
+        if self.skill_points:
+            self.details['skill_points'] = SKILL_POINTS_TO_SPEND.format(self.skill_points)
 
         # We've gotta replace the removed character detail entries
         # with our nice reformatted ones.
