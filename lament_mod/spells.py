@@ -80,11 +80,11 @@ def get_spell_slots(pcClass, level):
             else:
                 spell_slots.append(CLERIC_SPELL_SLOTS[(level - 1) - (2 * i)])
 
-    # Sigh. Level 20 is a special case that doesn't follow any handy pattern that I
-    # could find.
-    if level == 20:
-        spell_slots = [8, 7, 7, 6, 5, 5, 4]
-    print("\n\nThis character's spell slots are:\n", spell_slots, "\n\n")
+        # Sigh. Level 20 is a special case that doesn't follow any handy pattern that I
+        # could find.
+        if level == 20:
+            spell_slots = [8, 7, 7, 6, 5, 5, 4]
+
     return spell_slots
 
 
@@ -170,6 +170,9 @@ def create_spellsheet_pdf(details, PC_name, filename=None, directory=None):
         details['class'],
         details['level'],
         len(spell_slots))
+
+    spell_slots = tools.add_PDF_field_names(spell_slots, details['class'])
+    spell_list = {**spell_list, **spell_slots}
 
     if directory is None:
         directory = tempfile.TemporaryDirectory(dir=os.getcwd()).name
