@@ -35,7 +35,7 @@ h1 {
     transition: .4s;
 }
 
-input[type=text] {
+input[type=text], select {
     background-color: #4e0110;
     border: .2em solid #9b1d20;
     border-radius: .5em;
@@ -46,6 +46,11 @@ input[type=text] {
     font-size: 2em;
     font-family: 'Crimson Text', cursive;
     color: white;
+}
+
+/*Try to hide the hideous default dropdown arrow.*/
+.level {
+    appearance: none;
 }
 
 .random_generate {

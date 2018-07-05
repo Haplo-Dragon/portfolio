@@ -13,26 +13,6 @@ def test_add_PDF_field_names(equip_list, equip_type):
         assert equip_type in prefix
 
 
-@pytest.mark.parametrize("modifiers", [
-    {'STR': '0', 'DEX': '0', 'CON': '0', 'INT': '0', 'WIS': '0', 'CHA': '0'},
-    {'STR': '-1', 'DEX': '-2', 'CON': '-1', 'INT': '-2', 'WIS': '0', 'CHA': '-1'},
-    {'STR': '+1', 'DEX': '+2', 'CON': '+1', 'INT': '+2', 'WIS': '+1', 'CHA': '0'},
-    {'STR': '-2', 'DEX': '+3', 'CON': '0', 'INT': '0', 'WIS': '+1', 'CHA': '-1'},
-    {'STR': '+1', 'DEX': '+1', 'CON': '+1', 'INT': '+1', 'WIS': '+1', 'CHA': '+1'}])
-def test_clear_mod_zeroes(modifiers):
-    zeroes_cleared = tools.clear_mod_zeroes(modifiers)
-    assert '0' not in zeroes_cleared.values()
-
-
-@pytest.mark.parametrize("pcClass, expected", [
-    ('Magic-User', 'Summon'),
-    ('Cleric', 'Bless'),
-    ('Elf', 'Read Magic')])
-def test_add_class_based_spells(pcClass, expected):
-    spell_list = tools.add_class_based_spells([], pcClass)
-    assert expected in spell_list
-
-
 @pytest.mark.parametrize("filename, prefix, does_not_belong, splitter", [
     (tools.OVERSIZED_ITEMS, "Over", "Tiny Kitten", tools.split_over),
     (tools.TINY_ITEMS, "NonEnc", "Full-size Tiger", tools.split_tiny)])
@@ -70,3 +50,14 @@ def test_get_encumbrance(normal_equipment, oversized_equipment):
         pc_class="Dwarf")
     assert encumbrance >= 0
     assert encumbrance == 5
+
+
+@pytest.mark.parametrize("modifiers", [
+    {'STR': '0', 'DEX': '0', 'CON': '0', 'INT': '0', 'WIS': '0', 'CHA': '0'},
+    {'STR': '-1', 'DEX': '-2', 'CON': '-1', 'INT': '-2', 'WIS': '0', 'CHA': '-1'},
+    {'STR': '+1', 'DEX': '+2', 'CON': '+1', 'INT': '+2', 'WIS': '+1', 'CHA': '0'},
+    {'STR': '-2', 'DEX': '+3', 'CON': '0', 'INT': '0', 'WIS': '+1', 'CHA': '-1'},
+    {'STR': '+1', 'DEX': '+1', 'CON': '+1', 'INT': '+1', 'WIS': '+1', 'CHA': '+1'}])
+def test_clear_mod_zeroes(modifiers):
+    zeroes_cleared = tools.clear_mod_zeroes(modifiers)
+    assert '0' not in zeroes_cleared.values()

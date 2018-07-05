@@ -6,7 +6,17 @@ def test_lament_index(client):
     """Does the main page of Lament render properly?"""
     response = client.get('/character')
     assert response.status_code == 200
-    assert b'Fighter' in response.data
+    list_of_classes = [
+        'Fighter',
+        'Cleric',
+        'Magic-User',
+        'Specialist',
+        'Dwarf',
+        'Elf',
+        'Halfling']
+    for character_class in list_of_classes:
+        assert character_class.encode() in response.data
+    assert b'level' in response.data
 
 
 # Parametrizing allows us to test multiple bad inputs in one test without
@@ -21,7 +31,7 @@ def test_bad_data_entered_in_random_field(client, bad_input, expected_message):
     Many box?"""
     response = client.post(
         '/lament',
-        data={'randos': bad_input},
+        data={'randos': bad_input, 'desired_level': 1},
         follow_redirects=True)
     assert response.status_code == 200
     assert expected_message in response.data
@@ -34,7 +44,7 @@ def test_generating_over_20_characters(client, mocker):
         mock_fetch.return_value = json.load(f)
     response = client.post(
         '/lament',
-        data={'randos': 25},
+        data={'randos': 25, 'desired_level': 1},
         follow_redirects=True)
     assert response.status_code == 200
     # Ensure we're sending a PDF

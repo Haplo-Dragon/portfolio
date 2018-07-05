@@ -4,6 +4,7 @@ from flask import request, send_file, render_template, flash, url_for, redirect,
 
 import lament_mod.character as character
 import lament_mod.tools as tools
+import lament_mod.spells as spells
 from fdfgen import forge_fdf
 from PyPDF2 import PdfFileMerger, PdfFileReader
 import subprocess
@@ -48,6 +49,7 @@ def lament_pdf():
     path_to_pdftk = tools.get_pdftk_path()
     tmpdir = tempfile.TemporaryDirectory(dir=os.getcwd())
     calculate_encumbrance = True
+    desired_level = int(request.form['desired_level'])
 
     if "desired_class" in request.form.keys():
         desired_class = request.form['desired_class']
@@ -79,17 +81,20 @@ def lament_pdf():
         if desired_class:
             PC = character.LotFPCharacter(
                 desired_class,
+                desired_level,
                 calculate_encumbrance=calculate_encumbrance,
                 counter=i)
         else:
             PC = character.LotFPCharacter(
+                desired_class=None,
+                desired_level=desired_level,
                 calculate_encumbrance=calculate_encumbrance,
                 counter=i)
 
         # If the character has spells, create a PDF spell sheet and fill
         # it with spells and spell info
         if PC.pcClass in ['Cleric', 'Magic-User', 'Elf']:
-            tools.create_spellsheet_pdf(
+            spells.create_spellsheet_pdf(
                 PC.details,
                 PC.name,
                 filename=None,
