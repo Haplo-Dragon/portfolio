@@ -33,6 +33,8 @@ MIN_HP = {
     'Elf': 4,
     'Halfling': 4}
 
+# This is the old representation of save values, soon to be deprecated in favor of
+# the new array method.
 LOTFP_SAVES = {
     'Cleric': {'poison': 11, 'wands': 12, 'stone': 14, 'breath': 16, 'magic': 15},
     'Fighter': {'poison': 12, 'wands': 13, 'stone': 14, 'breath': 15, 'magic': 16},
@@ -48,8 +50,19 @@ SAVE_NAMES = ['stone', 'poison', 'breath', 'wands', 'magic']
 
 # This is how often the saves change. As in, the saves change every X levels, and this
 # is X.
-SAVE_CHANGE_INTERVALS = {'Cleric': 4, 'Fighter': 3, 'Specialist': 4}
+SAVE_CHANGE_INTERVALS = {
+    'Cleric': 4,
+    'Fighter': 3,
+    'Magic-User': 5,
+    'Specialist': 4,
+    'Dwarf': 3,
+    'Elf': 3,
+    'Halfling': 2}
 
+# In order to save space (and sanity), we're representing the saves as two-dimensional
+# arrays, with one row for initial (level 1) values and further rows representing each
+# time the saves change (4 to 6 times per class). This allows us to have 4-6 rows per
+# class, rather than 17+.
 NEW_SAVES = {
     'Cleric': np.array(
         [[14, 11, 16, 12, 15],
@@ -63,12 +76,43 @@ NEW_SAVES = {
          [-2, -2, -4, -2, -2],
          [-2, -2, -2, -2, -2],
          [-2, -2, -2, -2, -2]]),
+    'Magic-User': np.array(
+        [[13, 13, 16, 13, 14],
+         [-2, -2, -2, -2, -2],
+         [-2, -2, -2, -2, -4],
+         [-3, -2, -4, -4, -2],
+         [-1, -1, -1, -1, -2]]),
     'Specialist': np.array(
         [[14, 16, 15, 14, 14],
          [-3, -4, -1, -1, -2],
          [-2, -2, -2, -2, -2],
          [-2, -2, -2, -2, -2],
-         [-2, -2, -2, -2, -2]])
+         [-2, -2, -2, -2, -2]]),
+    'Dwarf': np.array(
+        [[10, 8, 13, 9, 12],
+         [-2, -2, -3, -2, -2],
+         [-2, -2, -3, -2, -2],
+         [-2, -2, -3, -2, -2],
+         [-2, 0, -2, -1, -2]]),
+    # Elf saves have a dummy row of zeroes inserted to deal with their strange special
+    # cases. Basically, level 16 does NOT have a change, even though dividing by the
+    # save interval would suggest that it does. The easiest way to handle this (without
+    # a lot of extra code) is to pad the array so that 16 does NOT change and 17 does.
+    # This allows us to keep the special case code the same for all classes.
+    'Elf': np.array(
+        [[13, 12, 15, 13, 15],
+         [-2, -2, -2, -2, -2],
+         [-2, -2, -4, -2, -2],
+         [-2, -2, -2, -2, -2],
+         [-2, -2, -2, -2, -2],
+         [0, 0, 0, 0, 0],
+         [-2, -1, -2, -2, -2]]),
+    'Halfling': np.array(
+        [[10, 8, 13, 9, 12],
+         [-2, -2, -3, -2, -2],
+         [-2, -2, -3, -2, -2],
+         [-2, -2, -3, -2, -2],
+         [-2, 0, -2, -1, -2]])
 }
 
 
@@ -101,7 +145,7 @@ class LotFPCharacter(object):
         self.equipment = tools.format_equipment_list(
             self.details,
             self.calculate_encumbrance)
-        self.attacks = self.calculate_attack_bonuses(self.mods, self.pcClass)
+        self.attacks = self.calculate_attack_bonuses(self.mods, self.level, self.pcClass)
         self.AC = self.calculate_armor_classes(
             self.mods,
             self.equipment,
@@ -216,22 +260,38 @@ class LotFPCharacter(object):
 
     def get_saves(self, pcClass, level, mods):
         """
-        We're only generating our own saves until the remote generator\
-        is fixed to return the right LotFP saves.
+        Calculate save values for a given character class and level.
 
         :param pcClass: The character class of the character.
+        :param level: The character's level.
         :param mods: The attribute modifiers of the character.
         :return: A dictionary of saves in the form 'poison': 12.
         """
         saves = LOTFP_SAVES[pcClass]
+        interval = SAVE_CHANGE_INTERVALS[pcClass]
 
-        if pcClass.casefold() in [
-                "Cleric".casefold(),
-                "Fighter".casefold(),
-                "Specialist".casefold()]:
-            interval = SAVE_CHANGE_INTERVALS[pcClass]
+        # This if statement is temporary, to keep the old saves working while
+        # we work on the new saves.
+        if pcClass in NEW_SAVES:
 
-            changes_to_saves = NEW_SAVES[pcClass][:math.ceil(level / interval)].sum(0)
+            # Levels 19+ are special cases for Magic-Users, 12+ are special cases
+            # for Dwarves, 17+ are special cases for Elves, and Halflings are a
+            # PAIN IN THE ASS. Halflings change immediately at level 2 and then every two
+            # levels thereafter.
+            if tools.is_special_case_for_saves(pcClass, level):
+                if pcClass.casefold() == "Halfling".casefold():
+                    level += 1
+                else:
+                    level += interval
+
+            # We're summing the appropriate rows of the array to get the new save values.
+            # Since these classes have save changes at a consistent interval (i.e., every
+            # 4 levels, or every 3 levels, etc.), we can determine which rows need to be
+            # summed by dividing level by interval and rounding. So we're slicing the
+            # array (array[:NUMBER_OF_ROWS]), and then summing the rows of that slice
+            # (.sum(0), the zero means sum across the row axis).
+            end_row = math.ceil(level / interval)
+            changes_to_saves = NEW_SAVES[pcClass][:end_row].sum(0)
             saves = dict(zip(SAVE_NAMES, changes_to_saves.flat))
 
         # We're SUBTRACTING the mod from the save because you
@@ -252,9 +312,9 @@ class LotFPCharacter(object):
 
         return skills
 
-    def calculate_attack_bonuses(self, mods, pcClass=None):
-        if pcClass == 'Fighter':
-            base = 2
+    def calculate_attack_bonuses(self, mods, level, pcClass=None):
+        if pcClass.casefold() == 'Fighter'.casefold():
+            base = min(2 + (level - 1), 10)
         else:
             base = 1
 
