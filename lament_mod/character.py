@@ -33,17 +33,6 @@ MIN_HP = {
     'Elf': 4,
     'Halfling': 4}
 
-# This is the old representation of save values, soon to be deprecated in favor of
-# the new array method.
-LOTFP_SAVES = {
-    'Cleric': {'poison': 11, 'wands': 12, 'stone': 14, 'breath': 16, 'magic': 15},
-    'Fighter': {'poison': 12, 'wands': 13, 'stone': 14, 'breath': 15, 'magic': 16},
-    'Magic-User': {'poison': 13, 'wands': 13, 'stone': 13, 'breath': 16, 'magic': 14},
-    'Specialist': {'poison': 16, 'wands': 14, 'stone': 14, 'breath': 15, 'magic': 14},
-    'Dwarf': {'poison': 8, 'wands': 9, 'stone': 10, 'breath': 13, 'magic': 12},
-    'Elf': {'poison': 12, 'wands': 13, 'stone': 13, 'breath': 15, 'magic': 15},
-    'Halfling': {'poison': 8, 'wands': 9, 'stone': 10, 'breath': 13, 'magic': 12}}
-
 # These correspond to Paralyze, Poison, Breath, Device, and Magic in the LotFP rules.
 # The names are different to maintain compatibility with the remote generator.
 SAVE_NAMES = ['stone', 'poison', 'breath', 'wands', 'magic']
@@ -63,7 +52,7 @@ SAVE_CHANGE_INTERVALS = {
 # arrays, with one row for initial (level 1) values and further rows representing each
 # time the saves change (4 to 6 times per class). This allows us to have 4-6 rows per
 # class, rather than 17+.
-NEW_SAVES = {
+LOTFP_SAVES = {
     'Cleric': np.array(
         [[14, 11, 16, 12, 15],
          [-2, -2, -2, -2, -3],
@@ -267,32 +256,27 @@ class LotFPCharacter(object):
         :param mods: The attribute modifiers of the character.
         :return: A dictionary of saves in the form 'poison': 12.
         """
-        saves = LOTFP_SAVES[pcClass]
         interval = SAVE_CHANGE_INTERVALS[pcClass]
 
-        # This if statement is temporary, to keep the old saves working while
-        # we work on the new saves.
-        if pcClass in NEW_SAVES:
+        # Levels 19+ are special cases for Magic-Users, 12+ are special cases
+        # for Dwarves, 17+ are special cases for Elves, and Halflings are a
+        # PAIN IN THE ASS. Halflings change immediately at level 2 and then every two
+        # levels thereafter.
+        if tools.is_special_case_for_saves(pcClass, level):
+            if pcClass.casefold() == "Halfling".casefold():
+                level += 1
+            else:
+                level += interval
 
-            # Levels 19+ are special cases for Magic-Users, 12+ are special cases
-            # for Dwarves, 17+ are special cases for Elves, and Halflings are a
-            # PAIN IN THE ASS. Halflings change immediately at level 2 and then every two
-            # levels thereafter.
-            if tools.is_special_case_for_saves(pcClass, level):
-                if pcClass.casefold() == "Halfling".casefold():
-                    level += 1
-                else:
-                    level += interval
-
-            # We're summing the appropriate rows of the array to get the new save values.
-            # Since these classes have save changes at a consistent interval (i.e., every
-            # 4 levels, or every 3 levels, etc.), we can determine which rows need to be
-            # summed by dividing level by interval and rounding. So we're slicing the
-            # array (array[:NUMBER_OF_ROWS]), and then summing the rows of that slice
-            # (.sum(0), the zero means sum across the row axis).
-            end_row = math.ceil(level / interval)
-            changes_to_saves = NEW_SAVES[pcClass][:end_row].sum(0)
-            saves = dict(zip(SAVE_NAMES, changes_to_saves.flat))
+        # We're summing the appropriate rows of the array to get the new save values.
+        # Since save changes mostly occur at a consistent interval (i.e., every
+        # 4 levels, or every 3 levels, etc.), we can determine which rows need to be
+        # summed by dividing level by interval and rounding. So we're slicing the
+        # array (array[:NUMBER_OF_ROWS]), and then summing the rows of that slice
+        # (.sum(0), the zero means sum across the row axis).
+        end_row = math.ceil(level / interval)
+        changes_to_saves = LOTFP_SAVES[pcClass][:end_row].sum(0)
+        saves = dict(zip(SAVE_NAMES, changes_to_saves.flat))
 
         # We're SUBTRACTING the mod from the save because you
         # have to roll over to save. A LOWER save is better.
