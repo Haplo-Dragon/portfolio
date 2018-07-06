@@ -10,7 +10,8 @@ import lament_mod.character as character
     ("Elf", "Chaotic")])
 def test_align(halfling, character_class, expected_alignment):
     """Is alignment assigned correctly based on class?"""
-    alignment = halfling.align(character_class)
+    halfling.pcClass = character_class
+    alignment = halfling.align()
     assert alignment == expected_alignment
 
 
