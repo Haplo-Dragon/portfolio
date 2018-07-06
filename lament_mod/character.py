@@ -313,18 +313,28 @@ class LotFPCharacter(object):
 
     def calculate_armor_classes(self):
         armor_classes = {}
+
+        # Shields add +1 to AC in melee combat and +2 to AC in ranged combat. We're
+        # setting the shield bonus to +1 if a shield is present to make it easier to
+        # add and subtract from different AC values.
         if 'Shield' in self.equipment.values() or 'Shield ' in self.equipment.values():
             shield_bonus = 1
         else:
             shield_bonus = 0
 
-        # original_AC already includes DEX modifier and armor worn,
-        # but not shield. Surprised AC means no DEX bonus, no shield,
-        # and an additional -2.
-        armor_classes['surprised_ac'] = self.details['ac'] - int(self.mods['DEXmod']) - 2
-        armor_classes['melee_ac'] = self.details['ac'] + shield_bonus
+        # self.details['ac'] already includes DEX modifier, armor worn, and +1 for
+        # shield (shields add +1 for melee and +2 for ranged). Surprised AC means
+        # no DEX bonus (for good or ill), no shield bonus, and an additional -2.
+        armor_classes['surprised_ac'] = self.details['ac'] - int(self.mods['DEXmod']) - shield_bonus - 2
+        armor_classes['melee_ac'] = self.details['ac']
+
+        # We're subtracting the +1 melee AC bonus for the shield, if present.
         armor_classes['melee_ac_noshield'] = armor_classes['melee_ac'] - shield_bonus
-        armor_classes['ranged_ac'] = self.details['ac'] + (2 * shield_bonus)
+
+        # Since self.details['ac'] ALREADY includes a +1 for the shield (if present), we
+        # only need to add 1 to reach the required +2 ranged AC bonus for having
+        # a shield.
+        armor_classes['ranged_ac'] = self.details['ac'] + shield_bonus
         armor_classes['ranged_ac_noshield'] = armor_classes['ranged_ac'] - (2 * shield_bonus)
 
         return armor_classes
