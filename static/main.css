@@ -380,7 +380,7 @@ html {
     border-radius: 0.8em; }
     @media (min-width: 900px) {
       .project-screen {
-        margin: 4em;   }
+        margin: 1em;   }
 }
 
 .contact-button {
@@ -389,7 +389,8 @@ html {
   background-color: #ca4d00;
   text-decoration: none;
   transition: 0.2s ease-out;
-  grid-column: 1; }
+  grid-column: 1;
+  align-self: center; }
   .contact-button p {
     font-family: 'Poiret One', cursive;
     font-size: 2em;
