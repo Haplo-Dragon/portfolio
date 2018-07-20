@@ -1,8 +1,411 @@
 @import "normalize";
 
-$font-stack: 'Cinzel Decorative', cursive;
+$bg-color: rgba(75, 0, 0, 1);
+$font-stack: 'Poiret One', cursive;
+$font-title: 'Amatic SC', cursive;
+$debug-border: none;
 
-h1 {
-    font-family: $font-stack;
-    text-align: center;
+//=============================
+// Breakpoints
+//=============================
+@mixin for-phone-only {
+  @media (max-width: 599px) { @content; }
 }
+@mixin for-tablet-portrait-up {
+  @media (min-width: 600px) { @content; }
+}
+@mixin for-tablet-landscape-up {
+  @media (min-width: 900px) { @content; }
+}
+@mixin for-desktop-up {
+  @media (min-width: 1200px) { @content; }
+}
+
+@mixin bottom-slant {
+  clip-path: polygon(
+    0 0,                /* top left */
+    100% 0,             /* top right */
+    100% 100%,          /* bottom right */
+    0 calc(100% - 8vw) /* bottom left */
+  );
+}
+
+@mixin top-slant {
+  clip-path: polygon(
+    0 0,
+    100% calc(0% + 8vw),
+    100% 100%,
+    0 100%
+  );
+}
+
+@mixin both-slant {
+  clip-path: polygon(
+    0 0,
+    100% calc(0% + 8vw),
+    100% 100%,
+    0 calc(100% - 8vw)
+  );
+}
+
+@mixin button {
+  border: $debug-border;  
+  border-radius: .8em;    
+  background-color: #ca4d00;
+  text-decoration: none;
+  transition: .2s ease-out;
+}
+
+@mixin button-outlines {
+  // Expanding borders for portfolio boxes, created with before after pseudo-elements
+  &:nth-child(n)::before,
+  &:nth-child(n)::after {
+    border-color: transparent;
+    border-radius: .2em;
+    -webkit-transition: ease-out 0.25s;
+    transition: ease-out 0.25s;
+    border-style: solid;
+    border-width: 0;
+    content: "";
+    height: 24px;
+    position: absolute;
+    width: 24px;
+  }  
+  &:nth-child(n)::before {
+    border-color: #ca4d00;
+    border-right-width: 2px;
+    border-top-width: 2px;
+    right: -15px;
+    top: -15px;
+  }
+  &:nth-child(n)::after {
+    border-color: #ca4d00;
+    border-bottom-width: 2px;  
+    border-left-width: 2px;
+    bottom: -15px;
+    left: -15px;
+  }
+  &:nth-child(n):hover:before,
+  &:nth-child(n):hover:after {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@mixin basic-grid {
+  display: grid;    
+  //grid-auto-rows: 1fr;  
+  grid-gap: .3rem;  
+  background-color: $bg-color;  
+  
+  @include for-tablet-landscape-up {
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+  }
+}
+
+@keyframes otto-fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+//Found Focus animation
+@keyframes found-focus {
+  0% {
+    -webkit-filter: blur(12px);
+            filter: blur(12px);
+    opacity: 0;
+  }
+  25% {
+    -webkit-filter: blur(5px);
+            filter: blur(5px);
+    opacity: .25;
+  }
+  40% {
+    -webkit-filter: blur(1px);
+            filter: blur(1px);
+    opacity: .45;
+  }
+  50% {
+    -webkit-filter: blur(16px);
+            filter: blur(16px);
+    opacity: .3;
+  }
+  60% {
+    -webkit-filter: blur(.2px);
+            filter: blur(.2px);
+    opacity: 1;
+  }
+  70% {
+    -webkit-filter: blur(3px);
+            filter: blur(3px);
+    opacity: .6;
+  }  
+  100% {
+    -webkit-filter: blur(0px);
+            filter: blur(0px);
+    opacity: 1;
+  }
+}
+
+/**
+ * ----------------------------------------
+ * animation slide-in-right
+ * ----------------------------------------
+ */
+@-webkit-keyframes slide-in-right {
+  0% {
+    -webkit-transform: translateX(1000px);
+            transform: translateX(1000px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes slide-in-right {
+  0% {
+    -webkit-transform: translateX(1000px);
+            transform: translateX(1000px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateX(0);
+            transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: black;
+  width: 100%;
+}
+
+h {
+  font-family: $font-stack;
+  font-size: 4em;
+  
+  @include for-tablet-landscape-up {font-size: 8em;}
+}
+
+.hero-grid-container {
+  @include bottom-slant;
+  @include basic-grid;
+}
+
+.otto-container { 
+  display: none;
+  animation: otto-fade 1.2s cubic-bezier(0.470, 0.000, 0.745, 0.715) .3s both;   
+  
+  @include for-tablet-landscape-up {
+    display: initial;
+    grid-column: 1;
+    grid-row: span 4;    
+    //overflow: hidden;
+    border: $debug-border;    
+  }
+}
+#otto-svg {
+  min-height: 135vh;
+  transform: translate(-20%, -15%);
+  @include for-phone-only {
+    display: hidden;
+  }
+}
+#otto-iris {  
+  fill: #ffff4d;
+  opacity: .6;
+}
+
+.title {
+  animation: found-focus 1.4s cubic-bezier(0.550, 0.085, 0.680, 0.530) .75s both;  
+  grid-column: 2 / end;  
+  justify-self: center;  
+  border: $debug-border;
+}
+
+.title-text {
+  font-family: $font-title;
+  font-size: 6em;  
+  @include for-tablet-landscape-up { font-size: 12em; }
+}
+
+.subtitle-text {
+  font-family: $font-title;
+  font-size: 2.8em;
+  text-align: right;
+}
+
+.quick-icon {
+  text-decoration: none;
+  color: #ca4d00;
+  padding-right: .15em;
+  transition: .8s cubic-bezier(0.250, 0.460, 0.450, 0.940);
+  
+  &:hover {
+    color: #ffcc00
+  }
+  
+  @include for-tablet-portrait-up {
+    padding-right: 1em;
+  }
+}
+
+// Subgrid for examples of work (portfolio boxes)
+.works-grid-container {  
+  grid-row: 2 / span 2;
+  grid-column: 2 / end;
+  display: grid;    
+  grid-auto-rows: 1fr;    
+  grid-gap: 1.3em;
+  justify-items: center;
+  align-items: top;
+  border: $debug-border; 
+  overflow: hidden;
+  
+  @include for-tablet-landscape-up {
+    justify-items: left;
+    grid-template-columns: repeat(3, minmax(200px, 1fr));
+    grid-gap: 3rem;
+  }
+}
+
+.work {
+  @include button;  
+  margin: .5em;
+  
+  @include for-tablet-landscape-up {
+    margin: .9em;
+    @include button-outlines;
+  }
+
+  // Text styling for portfolio boxes
+  p {
+    font-family: $font-stack;
+    font-size: 2em;
+    color: white;    
+    padding-left: 1em;
+    padding-right: 1em;       
+  }
+  
+  &:hover {
+  -webkit-box-shadow: 1em 1em 2.8em 0em rgba(0,0,0,0.75);
+  -moz-box-shadow: 1em 1em 2.8em 0em rgba(0,0,0,0.75);
+  box-shadow: 1em 1em 2.8em 0em rgba(0,0,0,0.75);
+  }
+  
+  // First portfolio box
+  &:nth-child(1) {
+    //grid-column: 1;
+    grid-row: 1;        
+    animation: slide-in-right 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) 1.7s both;
+  }
+  // Second portfolio box
+  &:nth-child(2) {    
+    grid-row: 2;
+    animation: slide-in-right 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) 1.9s both;
+    
+    @include for-tablet-landscape-up {
+      grid-column: 2;
+    }
+  }
+  // Third portfolio box
+  &:nth-child(3) {    
+    grid-row: 3;
+    animation: slide-in-right 0.9s cubic-bezier(0.250, 0.460, 0.450, 0.940) 1.9s both;
+    
+    @include for-tablet-landscape-up {
+      grid-column: 3;
+    }
+  }
+  
+}
+
+
+.project-grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 3em;
+  justify-items: center;
+  @include for-tablet-landscape-up {grid-template-columns: 2fr 1fr;}  
+}
+
+.projects {    
+  @include both-slant;
+  background-color: $bg-color;
+  color: white;  
+  padding-top: 3em;
+  //padding-left: 2em;
+  //padding-right: 2em;
+  padding-bottom: 25em;  
+  margin-top: 5em;
+  margin-bottom: 3em;
+  
+  h3 {
+    font-size: .8em;
+  }
+  
+  @include for-tablet-landscape-up {    
+    padding-top: 8em;
+    h {
+      letter-spacing: .5em;
+    }
+    h3 {
+      font-size: 2em;
+    }
+  }
+}
+
+.project-blurb {
+  padding: 2em;
+}
+
+.project-screen {
+  border-radius: .8em;
+  //margin: 1em;
+  //box-sizing: border-box;
+  @include for-tablet-landscape-up {margin: 4em;}  
+}
+
+.contact-button {
+  @include button;    
+  grid-column: 1;
+  
+  p {
+    font-family: $font-stack;
+    font-size: 2em;
+    color: white;        
+    padding-left: 1em;
+    padding-right: 1em;
+    
+    @include for-tablet-landscape-up {
+      font-size: 3.6em;
+      padding-left: 2em;
+      padding-right: 2em;
+    }
+  }
+  
+  &:hover {
+  -webkit-box-shadow: 1em 1em 2.8em 0em rgba(0,0,0,0.75);
+  -moz-box-shadow: 1em 1em 2.8em 0em rgba(0,0,0,0.75);
+  box-shadow: 1em 1em 2.8em 0em rgba(0,0,0,0.75);
+  }
+}
+
+// ====================
+// Ghost CSS debugging
+// ====================
+// * {
+//   background: #000 !important;
+//   color: #0f0 !important;
+//   outline: solid #f00 1px !important;
+// }
