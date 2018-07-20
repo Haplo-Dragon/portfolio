@@ -239,7 +239,8 @@ html {
 
     .title-text {
       font-family: 'Amatic SC', cursive;
-      font-size: 6em; }
+      font-size: 6em;
+      color: #000000; }
       @media (min-width: 900px) {
         .title-text {
           font-size: 12em;   }
