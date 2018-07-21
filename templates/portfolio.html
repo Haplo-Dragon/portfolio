@@ -47,38 +47,67 @@
         <p>Lament — A web app</p>                
       </a>
     
-    <a href="#lucre" class="work">
-      <p>Lucre — Android</p>
+    <a href="#about" class="work">
+      <p>Self-aggrandizement</p>
     </a>
     
     <a href="#contact" class="work">
-      <p>Contact me</p>
+      <p>Contact</p>
     </a>   
   </div>
   
 </div>
 
 
-
 <div id="lament" class="projects">
   <div class="project-grid-container">
+    
     <div class="project-blurb">
       <h>LAMENT</h>
-      <p><h3>A web tool for creating roleplaying game characters
-      and filling PDF character sheets with their information.</h3></p>  
+      <h3>A web tool for creating roleplaying game characters
+      and filling PDF character sheets with their information.</h3>
+      <p>A resource for for <i>THOSE</i> players. You know the ones. Players whose characters have a life expectancy of <i>ten feet into the dungeon or so, assuming there wasn't something shiny to touch on the stairs on the way down</i>?</p>
+      <p>Now you can generate a giant pile of random characters and just hand 'em the next sheet off the stack when they inevitably perish in some dank pit underground.</p>
     </div>
-    <a href="{{ url_for('lament.index') }}" class="contact-button">
-      <p>Wanna try it out?</p>
-    </a>
+
     <img class="project-screen" src="{{ url_for('static', filename='LamentMockup.png') }}" alt="Screenshot of web app Lament">
+
+    <a href="{{ url_for('lament.index') }}" class="contact-button">
+      <p>Try it!</p>
+    </a>
     
   </div>
 </div>
 
-<div id="lucre" class="projects">
-  <div class="project-blurb">
-    <h>LUCRE</h>
-    <h3>An Android app for keeping track of money</h3>
+<div id="about" class="projects">
+  <div class="project-grid-container">
+
+    <div class="project-blurb">
+      <h>I'M ETHAN</h>
+      <p>I'm a developer based in Texas. I work in several languages, but I'm most comfortable in Python.</p>
+      <p>Black cats are <i>good</i> luck for me. If you ask, I might even tell you why.</p>
+      
+      <h3>I've done a lot of things...</h3>
+      <p>I started out thinking I was gonna be a musician - I even went to university planning to double major in computer science and music, but when they told me I couldn't do both, I chose to get a music degree.</p>
+      
+      <h3>Oops.</h3>
+      <p>Yeah, you can imagine how well that worked out in terms of financial stability and job security. But I DID learn how to think critically, work in an ensemble, and apply myself to a complex skill that requires dedicated practice. I've used those skills ever since.</p>
+      <p>So...I've got a college degree. I've been a musician, a bartender, a prison guard, a teacher, a manual laborer, and even a pizza delivery dude.</p>
+      
+      <h3>...but mostly I'm a huge nerd</h3>
+      <p>I started programming with Turbo Pascal when I was a kid, and I haven't stopped since. I'm always gnawing
+      away at some personal project or other, contributing to open source projects, and thinking about programming.</p>
+      <p>There's a visceral joy in learning something new that I just can't find anywhere else, and I've got a voracious appetite for new information that is NEVER satisfied.</p>
+      
+      <h3>I've got hobbies, too</h3>
+      <p>Every time I move, it seems like 90% of the boxes are books. I play roleplaying and video games. I'm a bookbinder. I think <a href="https://www.imdb.com/name/nm0942367/">Edgar Wright</a> is a genius. So is <a href="https://en.wikipedia.org/wiki/Hideki_Naganuma">Hideki Naganuma.</a></p>
+      
+      <h3>Enough babbling!</h3>
+      <p><a href="#contact">Send me an email.</a> I'd love to hear from you.</p>
+    </div>
+
+    <img class="project-screen" src="{{ url_for('static', filename='Headshot.jpg') }}" alt="A picture of my ugly mug">
+
   </div>
 </div>
 
