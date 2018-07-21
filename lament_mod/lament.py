@@ -39,7 +39,7 @@ FILLABLE_CHARACTER_SHEET = os.path.join(
 lamentApp = Blueprint('lament', __name__, subdomain="lament")
 
 
-@lamentApp.route('/character')
+@lamentApp.route('/')
 def index():
     return render_template('lament/lament.html', sass=random.choice(SASS))
 
