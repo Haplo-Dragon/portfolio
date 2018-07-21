@@ -190,12 +190,18 @@ html {
     background-color: black;
     width: 100%; }
 
+    a {
+      text-decoration: none;
+      color: #ffcc00; }
+      a:visited {
+        color: #ca4d00; }
+
+h {
+  font-family: 'Poiret One', cursive;
+  font-size: 4em; }
+  @media (min-width: 900px) {
     h {
-      font-family: 'Poiret One', cursive;
-      font-size: 4em; }
-      @media (min-width: 900px) {
-        h {
-          font-size: 8em;   }
+      font-size: 8em;   }
 }
 
 .hero-grid-container {
@@ -366,14 +372,18 @@ html {
   margin-top: 5em;
   margin-bottom: 3em; }
   .projects h3 {
-    font-size: 0.8em; }
-    @media (min-width: 900px) {
-      .projects {
-        padding-top: 8em;   }
-        .projects h {
-          letter-spacing: 0.5em;   }
-          .projects h3 {
-            font-size: 2em;   }
+    font-size: 1.8em; }
+    .projects p {
+      font-size: 1em; }
+      @media (min-width: 900px) {
+        .projects {
+          padding-top: 8em;   }
+          .projects h {
+            letter-spacing: 0.5em;   }
+            .projects h3 {
+              font-size: 2.5em;   }
+              .projects p {
+                font-size: 1.6em;   }
 }
 
 .project-blurb {
@@ -385,7 +395,8 @@ html {
     height: auto; }
     @media (min-width: 900px) {
       .project-screen {
-        margin: 1em;   }
+        margin: 1em;
+        margin-top: 8em;   }
 }
 
 .contact-button {

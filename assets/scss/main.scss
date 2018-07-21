@@ -190,6 +190,15 @@ body {
   width: 100%;
 }
 
+a {
+    text-decoration: none;
+    color: #ffcc00;
+
+    &:visited {
+        color: #ca4d00;
+    }
+}
+
 h {
   font-family: $font-stack;
   font-size: 4em;
@@ -358,16 +367,25 @@ h {
   margin-bottom: 3em;
   
   h3 {
-    font-size: .8em;
+    font-size: 1.8em;
+  }
+
+  p {
+    font-size: 1em;
   }
   
   @include for-tablet-landscape-up {    
     padding-top: 8em;
+    
     h {
       letter-spacing: .5em;
     }
     h3 {
-      font-size: 2em;
+      font-size: 2.5em;
+    }
+
+    p {
+      font-size: 1.6em;
     }
   }
 }
@@ -382,7 +400,10 @@ h {
   height: auto;
   //margin: 1em;
   //box-sizing: border-box;
-  @include for-tablet-landscape-up {margin: 1em;}  
+  @include for-tablet-landscape-up {
+    margin: 1em;
+    margin-top: 8em;
+  }  
 }
 
 .contact-button {
