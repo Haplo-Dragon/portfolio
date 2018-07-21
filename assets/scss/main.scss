@@ -96,9 +96,9 @@ $debug-border: none;
   display: grid;    
   //grid-auto-rows: 1fr;  
   grid-gap: .3rem;  
-  background-color: $bg-color;  
+  background-color: $bg-color;
   
-  @include for-tablet-landscape-up {
+  @include for-desktop-up {
     grid-template-columns: repeat(3, minmax(200px, 1fr));
   }
 }
@@ -204,9 +204,9 @@ h {
 
 .otto-container { 
   display: none;
-  animation: otto-fade 1.2s cubic-bezier(0.470, 0.000, 0.745, 0.715) .3s both;   
+  animation: otto-fade 1.2s cubic-bezier(0.470, 0.000, 0.745, 0.715) .3s both;
   
-  @include for-tablet-landscape-up {
+  @include for-desktop-up {
     display: initial;
     grid-column: 1;
     grid-row: span 4;    
@@ -215,11 +215,17 @@ h {
   }
 }
 #otto-svg {
+  display: hidden;
   min-height: 135vh;
+  max-width: 20vw;
   transform: translate(-20%, -15%);
-  @include for-phone-only {
-    display: hidden;
+  
+  @include for-desktop-up {
+    max-width: 45vw;
   }
+  // @include for-phone-only {
+  //   display: hidden;
+  // }
 }
 #otto-iris {  
   fill: #ffff4d;
@@ -235,7 +241,7 @@ h {
 
 .title-text {
   font-family: $font-title;
-  font-size: 6em;  
+  font-size: 6em;
   @include for-tablet-landscape-up { font-size: 12em; }
 }
 
@@ -252,7 +258,7 @@ h {
   transition: .8s cubic-bezier(0.250, 0.460, 0.450, 0.940);
   
   &:hover {
-    color: #ffcc00
+    color: #ffcc00;
   }
   
   @include for-tablet-portrait-up {
@@ -271,6 +277,7 @@ h {
   align-items: top;
   border: $debug-border; 
   overflow: hidden;
+  padding-bottom: 6em;
   
   @include for-tablet-landscape-up {
     justify-items: left;
@@ -385,7 +392,7 @@ h {
   
   p {
     font-family: $font-stack;
-    font-size: 2em;
+    font-size: 1.4em;
     color: white;        
     padding-left: 1em;
     padding-right: 1em;
@@ -403,6 +410,23 @@ h {
   box-shadow: 1em 1em 2.8em 0em rgba(0,0,0,0.75);
   }
 }
+
+// footer {
+//   @include top-slant;
+
+//   background-color: $bg-color;
+//   padding-top: 6em;
+  
+//   p {
+//     font-size: .9em;
+//     line-height: 120%;
+//     text-align: center;
+//   }
+
+//   p:first-child {
+//     padding-top: 1em;
+//   }
+// }
 
 // ====================
 // Ghost CSS debugging

@@ -203,7 +203,7 @@ html {
   display: grid;
   grid-gap: 0.3rem;
   background-color: #4b0000; }
-  @media (min-width: 900px) {
+  @media (min-width: 1200px) {
     .hero-grid-container {
       grid-template-columns: repeat(3, minmax(200px, 1fr));   }
 }
@@ -211,7 +211,7 @@ html {
 .otto-container {
   display: none;
   animation: otto-fade 1.2s cubic-bezier(0.47, 0, 0.745, 0.715) 0.3s both; }
-  @media (min-width: 900px) {
+  @media (min-width: 1200px) {
     .otto-container {
       display: initial;
       grid-column: 1;
@@ -220,11 +220,13 @@ html {
 }
 
 #otto-svg {
+  display: hidden;
   min-height: 135vh;
+  max-width: 20vw;
   transform: translate(-20%, -15%); }
-  @media (max-width: 599px) {
+  @media (min-width: 1200px) {
     #otto-svg {
-      display: hidden;   }
+      max-width: 45vw;   }
 }
 
 #otto-iris {
@@ -271,7 +273,8 @@ html {
   justify-items: center;
   align-items: top;
   border: none;
-  overflow: hidden; }
+  overflow: hidden;
+  padding-bottom: 6em; }
   @media (min-width: 900px) {
     .works-grid-container {
       justify-items: left;
@@ -395,7 +398,7 @@ html {
   align-self: center; }
   .contact-button p {
     font-family: 'Poiret One', cursive;
-    font-size: 2em;
+    font-size: 1.4em;
     color: white;
     padding-left: 1em;
     padding-right: 1em; }
