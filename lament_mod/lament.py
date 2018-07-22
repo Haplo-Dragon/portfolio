@@ -40,6 +40,7 @@ lamentApp = Blueprint('lament', __name__, subdomain="lament")
 
 
 @lamentApp.route('/')
+# @lamentApp.route('/character')
 def index():
     return render_template('lament/lament.html', sass=random.choice(SASS))
 
