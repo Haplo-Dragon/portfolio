@@ -1,10 +1,12 @@
 import pytest
 import json
 
+LAMENT_SUBDOMAIN = "http://lament.localhost:42000"
+
 
 def test_lament_index(client):
     """Does the main page of Lament render properly?"""
-    response = client.get('/character')
+    response = client.get('/', base_url=LAMENT_SUBDOMAIN)
     assert response.status_code == 200
     list_of_classes = [
         'Fighter',
@@ -32,7 +34,8 @@ def test_bad_data_entered_in_random_field(client, bad_input, expected_message):
     response = client.post(
         '/lament',
         data={'randos': bad_input, 'desired_level': 1},
-        follow_redirects=True)
+        follow_redirects=True,
+        base_url=LAMENT_SUBDOMAIN)
     assert response.status_code == 200
     assert expected_message in response.data
 
@@ -45,7 +48,8 @@ def test_generating_over_20_characters(client, mocker):
     response = client.post(
         '/lament',
         data={'randos': 25, 'desired_level': 1},
-        follow_redirects=True)
+        follow_redirects=True,
+        base_url=LAMENT_SUBDOMAIN)
     assert response.status_code == 200
     # Ensure we're sending a PDF
     assert response.mimetype == "application/pdf"
