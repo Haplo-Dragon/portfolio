@@ -1,2 +1,5 @@
 # Ethan Fulbright, Developer
-Portfolio website for Ethan Fulbright
+I'm an _eternal development nerd._
+
+## [See?](ethanfulbright.com)
+
