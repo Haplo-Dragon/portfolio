@@ -251,6 +251,7 @@ h {
 .title-text {
   font-family: $font-title;
   font-size: 6em;
+  color: #e6b800;
   @include for-tablet-landscape-up { font-size: 12em; }
 }
 
@@ -258,6 +259,7 @@ h {
   font-family: $font-title;
   font-size: 2.8em;
   text-align: right;
+  color: #e6b800;
 }
 
 .quick-icon {
