@@ -9,6 +9,9 @@ def create_app():
 
     app.config['DEBUG'] = False
     app.config['SECRET_KEY'] = 'devkey devkey'
+    # Uncomment this line for local testing?
+    # It makes the subdomains route properly. May also be needed for AWS EC2 instance?
+    # app.config['SERVER_NAME'] = 'localhost:42000'
 
     # Parse SCSS styling into CSS
     scss = Scss(app)

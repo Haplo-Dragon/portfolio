@@ -36,10 +36,11 @@ FILLABLE_CHARACTER_SHEET = os.path.join(
     os.path.dirname(__file__),
     'LotFPCharacterSheetLastGaspFillable.pdf')
 
-lamentApp = Blueprint('lament', __name__)
+lamentApp = Blueprint('lament', __name__, subdomain="lament")
 
 
-@lamentApp.route('/character')
+@lamentApp.route('/')
+# @lamentApp.route('/character')
 def index():
     return render_template('lament/lament.html', sass=random.choice(SASS))
 

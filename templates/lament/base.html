@@ -6,7 +6,7 @@
 
     <title> {% block title %}{% endblock %} - Lament </title>
 
-    <link rel="stylesheet" type="text/css" href="../static/lament.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='lament.css') }}">
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Crimson+Text|Nixie+One">
 
     {% block scripts %}        
