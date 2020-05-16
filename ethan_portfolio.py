@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_scss import Scss
+import artlogic.artlogic as artlogic
 import lament_mod.lament as lament
 
 
@@ -19,6 +20,7 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(lament.lamentApp)
+    app.register_blueprint(artlogic.artlogicApp)
 
     @app.route('/')
     def index():
