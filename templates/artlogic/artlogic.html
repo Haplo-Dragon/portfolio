@@ -6,33 +6,37 @@
 {% endblock %}
 
 {%block content %}
-
-<div class="formwrapper">
-    <h2 class="title">Encode/Decode</h2>
-    <form method="POST" action="/artlogic">
-        {{ form.csrf_token }}
-        
-        <div class="form-field"> {{ form.input_data.label }} {{ form.input_data }}
+<div class="container">
+    <div class="formwrapper">
+        <h2 class="title">Encode/Decode</h2>
+        <form method="POST" action="/artlogic">
+            {{ form.csrf_token }}
             
-            {% if form.errors %}
-                <ul class="errors">
-                    {% for error in form.errors %}
-                    <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        
-        </div>
-        {{ form.submit }}
-    </form>       
-</div>
+            <div class="form-field">
+                {{ form.input_data.label }} 
+                
+                {{ form.input_data(class_='input-box') }}
+                
+                {% if form.errors %}
+                    <ul class="errors">
+                        {% for error in form.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            
+            </div>
+            {{ form.submit(class_='btn-submit') }}
+        </form>       
+    </div>
 
-<div class="outputwrapper">
-    <h2 class="title">Output</h2>
-    <div class="output">
-        {% if output %}
-            <p>{{ output }}</p>
-        {% endif %}
+    <div class="outputwrapper">
+        <h2 class="title">Output</h2>
+        <div class="output">
+            {% if output %}
+                <p>{{ output }}</p>
+            {% endif %}
+        </div>
     </div>
 </div>
 
