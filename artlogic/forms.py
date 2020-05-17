@@ -10,4 +10,4 @@ class ArtLogicForm(FlaskForm):
     """
     input_data = StringField("String/Integer(s) to encode/decode", [
         DataRequired()])
-    submit = SubmitField('Submit')
+    submit = SubmitField('SUBMIT')
