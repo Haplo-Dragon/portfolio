@@ -10,7 +10,7 @@ def app():
     app = ethan_portfolio.create_app()
     app.config['TESTING'] = True
     app.config['SECRET_KEY'] = 'TestingKey'
-    app.config['SERVER_NAME'] = 'localhost:42000'
+    # app.config['SERVER_NAME'] = 'localhost:42000'
     app.allow_subdomain_redirects = True
     return app
 
