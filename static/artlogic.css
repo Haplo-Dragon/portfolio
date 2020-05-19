@@ -29,7 +29,8 @@ body {
             background: #9E98A6;
             border: none;
             border-radius: 0.25rem;
-            font-size: 1rem; }
+            font-size: 1.3rem;
+            min-width: 30vw; }
 
             .btn-submit {
               background: #7C9785;

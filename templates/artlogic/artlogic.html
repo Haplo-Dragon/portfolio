@@ -13,9 +13,9 @@
             {{ form.csrf_token }}
             
             <div class="form-field">
-                {{ form.input_data.label }} 
+                <!-- {{ form.input_data.label }}  -->
                 
-                {{ form.input_data(class_='input-box') }}
+                <p>{{ form.input_data(class_='input-box') }}</p>
                 
                 {% if form.errors %}
                     <ul class="errors">
