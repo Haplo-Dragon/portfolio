@@ -18,10 +18,16 @@ def index():
     """
     form = forms.ArtLogicForm()
 
+    # If the submit button is clicked and the form validates, we'll handle
+    # the data (converting between strings and integers as necessary) and
+    # return the same page with the output.
     if form.validate_on_submit():
         output = handleData(form.data['input_data'])
         return redirect(url_for('artlogic.index', output=output))
 
+    # If the submit button hasn't been clicked, we'll just return the page
+    # with whatever output is currently set (if no data has been submitted
+    # previously, the output will be blank).
     return render_template(
         'artlogic/artlogic.html',
         title=TITLE,
@@ -36,13 +42,12 @@ def handleData(data):
     # Determine if the data is a list of integers by attempting to coerce
     # it to the integer type.
     try:
+        encoded_ints = []
         for item in data.split(" "):
             int(item)
+            encoded_ints.append(item)
         # If this completes without exceptions, we know the data is a list
         # of integers, and we can decode them.
-        encoded_ints = data.split(" ")
-        encoded_ints = [int(item) for item in encoded_ints]
-
         return encode.decode(encoded_ints)
 
     # If coercing the data to an integer throws an exception, then we know
