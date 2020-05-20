@@ -38,14 +38,14 @@ def index():
 def handleData(data):
     """
     Determine if the data is integers or a string, and encode/decode it.
+    Returns a string.
     """
     # Determine if the data is a list of integers by attempting to coerce
     # it to the integer type.
     try:
         encoded_ints = []
         for item in data.split(" "):
-            int(item)
-            encoded_ints.append(item)
+            encoded_ints.append(int(item))
         # If this completes without exceptions, we know the data is a list
         # of integers, and we can decode them.
         return encode.decode(encoded_ints)
@@ -62,6 +62,6 @@ def handleData(data):
             result = ' '.join(int_strings)
         else:
             # If it's only one integer, we can display it as is.
-            result = encoded_ints
+            result = str(encoded_ints[0])
 
         return result
