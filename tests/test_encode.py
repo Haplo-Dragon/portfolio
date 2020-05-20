@@ -49,6 +49,16 @@ def test_given_examples_part_2(example, expected):
     assert example == encode.decode(encode.encode(example))
 
 
+def test_too_long_integer():
+    """
+    Does the decoding process correctly handle integers over 32 bits in length?
+    """
+    over_32_bits = 1659684413514848461451648
+    assert over_32_bits.bit_length() > 32
+    with pytest.raises(ValueError):
+        encode.decode([over_32_bits])
+
+
 def test_chunk():
     """
     Does chunk() divide a string into chunks of the correct size without

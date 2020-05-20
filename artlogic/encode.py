@@ -77,6 +77,9 @@ def _decode(integer):
     Decode the given 32-bit integer into a MAX_LENGTH character string according
     to the scheme in the specification. Returns a string.
     """
+    if integer.bit_length() > 32:
+        raise ValueError("Can only decode 32-bit integers.")
+
     decoded_int = 0
 
     # Since each byte has its bits distributed along the given integer at

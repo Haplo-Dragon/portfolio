@@ -33,3 +33,13 @@ def test_handleData(example, expected):
     """
     assert artlogic.handleData(example) == expected
     assert artlogic.handleData(expected) == example
+
+
+def test_handleData_too_long_integer():
+    """
+    Does handleData() correctly interpret integers over 32 bits as strings?
+    """
+    over_32_bits = 1659684413514848461451648
+    assert over_32_bits.bit_length() > 32
+    assert artlogic.handleData(str(over_32_bits)) == \
+        '16746029 16723216 16712751 16753920 16714532 16715075 1118208'
