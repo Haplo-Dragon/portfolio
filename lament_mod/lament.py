@@ -133,15 +133,28 @@ def lament_pdf():
     if os.path.exists(final_name):
         os.remove(final_name)
 
-    merger = PdfFileMerger()
-    PDFs_to_be_merged = glob.glob(os.path.join(tmpdir.name, '*.pdf'))
-
-    for PDF in PDFs_to_be_merged:
-        merger.append(PdfFileReader(open(PDF, 'rb')))
-
-    merger.write(final_name)
+    # Merge all the individual PDFs into one final PDF.
+    mergePDFs(tmpdir.name, final_name)
 
     return send_file(final_name,
                      mimetype="application/pdf",
                      as_attachment=True,
                      attachment_filename=final_name)
+
+
+def mergePDFs(temp_dir_name, final_PDF_name):
+    """
+    Merges all files ending in .pdf in the given temporary directory into a single
+    PDF. Writes the final PDF back into the given temporary directory.
+    """
+    merger = PdfFileMerger()
+    PDFs_to_be_merged = glob.glob(os.path.join(temp_dir_name, '*.pdf'))
+
+    # Sort the PDFs so they show up in the correct order in the final document.
+    PDFs_to_be_merged.sort()
+
+    for PDF in PDFs_to_be_merged:
+        with open(PDF, 'rb'):
+            merger.append(PdfFileReader(PDF))
+
+    merger.write(final_PDF_name)
