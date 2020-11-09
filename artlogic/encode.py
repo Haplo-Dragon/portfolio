@@ -26,8 +26,7 @@ def _encode(string):
     the scheme in the specification. Returns a 32-bit integer.
     """
     if len(string) > MAX_LENGTH:
-        raise ValueError("Can only encode strings of 0-{} characters.".format(
-            MAX_LENGTH))
+        raise ValueError("Can only encode strings of 0-{} characters.".format(MAX_LENGTH))
 
     # Get a byte array from the given string.
     # We're using the default encoding of UTF-8 because it matches the examples
@@ -69,7 +68,7 @@ def decode(integers):
     for integer in integers:
         string_chunks.append(_decode(integer))
 
-    return ''.join(string_chunks)
+    return "".join(string_chunks)
 
 
 def _decode(integer):
@@ -101,7 +100,7 @@ def _decode(integer):
 
     # Get a byte array from the decoded integer. We're reversing the byte order
     # because we read the input integer from lowest-order bit to highest-order.
-    decoded_bytes = decoded_int.to_bytes(4, byteorder='little')
+    decoded_bytes = decoded_int.to_bytes(4, byteorder="little")
 
     # Get the characters represented by each byte, ignoring empty bytes.
     chars = []
@@ -109,7 +108,7 @@ def _decode(integer):
         if byte:
             chars.append(chr(byte))
 
-    return ''.join(chars)
+    return "".join(chars)
 
 
 def getBit(num, n):
@@ -134,7 +133,7 @@ def chunk(string, n):
     Split string into chunks of length <= n. Returns a generator.
     """
     for i in range(0, len(string), n):
-        yield string[i: i + n]
+        yield string[i : i + n]
 
 
 if __name__ == "__main__":

@@ -7,10 +7,10 @@ import artlogic.forms as forms
 
 TITLE = "Art & Logic Programming Challenge"
 
-artlogicApp = Blueprint('artlogic', __name__)
+artlogicApp = Blueprint("artlogic", __name__)
 
 
-@artlogicApp.route('/artlogic', methods=['GET', 'POST'])
+@artlogicApp.route("/artlogic", methods=["GET", "POST"])
 def index():
     """
     The Art & Logic Programming Challenge webapp, with a form for input data
@@ -22,17 +22,18 @@ def index():
     # the data (converting between strings and integers as necessary) and
     # return the same page with the output.
     if form.validate_on_submit():
-        output = handleData(form.data['input_data'])
-        return redirect(url_for('artlogic.index', output=output))
+        output = handleData(form.data["input_data"])
+        return redirect(url_for("artlogic.index", output=output))
 
     # If the submit button hasn't been clicked, we'll just return the page
     # with whatever output is currently set (if no data has been submitted
     # previously, the output will be blank).
     return render_template(
-        'artlogic/artlogic.html',
+        "artlogic/artlogic.html",
         title=TITLE,
         form=form,
-        output=request.args.get('output'))
+        output=request.args.get("output"),
+    )
 
 
 def handleData(data):
@@ -59,7 +60,7 @@ def handleData(data):
         # one integer, so we need to join them into a string for display.
         if len(encoded_ints) > 1:
             int_strings = [str(item) for item in encoded_ints]
-            result = ' '.join(int_strings)
+            result = " ".join(int_strings)
         else:
             # If it's only one integer, we can display it as is.
             result = str(encoded_ints[0])

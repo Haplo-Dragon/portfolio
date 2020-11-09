@@ -3,10 +3,10 @@ import math
 from lament_mod import spells
 
 
-@pytest.mark.parametrize("pcClass, expected", [
-    ('Magic-User', 'Summon'),
-    ('Cleric', 'Bless'),
-    ('Elf', 'Read Magic')])
+@pytest.mark.parametrize(
+    "pcClass, expected",
+    [("Magic-User", "Summon"), ("Cleric", "Bless"), ("Elf", "Read Magic")],
+)
 def test_create_spell_list(pcClass, expected):
     """Is the Level 1 spell list being filled with the appropriate spells?"""
     spell_list = spells.create_spell_list([], pcClass, level=1)
@@ -21,8 +21,8 @@ def test_list_number_of_random_spells_by_level(level):
 
     number_of_spells_by_level = [0 for i in range(highest_spell_level)]
     number_of_spells_by_level = spells.list_number_of_random_spells_by_level(
-        number_of_spells_by_level,
-        level)
+        number_of_spells_by_level, level
+    )
 
     # Always ONE level 1 spell
     assert number_of_spells_by_level[0] == 1

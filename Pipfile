@@ -17,3 +17,7 @@ flask-wtf = "*"
 pytest = "*"
 pytest-cov = "*"
 pytest-mock = "*"
+black = "*"
+
+[pipenv]
+allow_prereleases = true

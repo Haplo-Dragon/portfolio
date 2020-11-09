@@ -8,8 +8,8 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(__name__)
 
-    app.config['DEBUG'] = False
-    app.config['SECRET_KEY'] = 'devkey devkey'
+    app.config["DEBUG"] = False
+    app.config["SECRET_KEY"] = "devkey devkey"
     # Uncomment this line for local testing?
     # It makes the subdomains route properly. May also be needed for AWS EC2 instance?
     # app.config['SERVER_NAME'] = 'localhost:42000'
@@ -22,9 +22,9 @@ def create_app():
     app.register_blueprint(lament.lamentApp)
     app.register_blueprint(artlogic.artlogicApp)
 
-    @app.route('/')
+    @app.route("/")
     def index():
-        return render_template('portfolio.html', title="Ethan Fulbright")
+        return render_template("portfolio.html", title="Ethan Fulbright")
 
     @app.after_request
     def gnu_terry_pratchett(resp):
@@ -34,6 +34,6 @@ def create_app():
     return app
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = create_app()
     app.run(port=42000)

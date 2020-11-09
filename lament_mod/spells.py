@@ -8,33 +8,48 @@ from fdfgen import forge_fdf
 import lament_mod.tools as tools
 
 CLERIC_SPELLS = [
-    'Bless', 'Command', 'Cure Light Wounds', 'Detect Evil',
-    'Invisibility to Undead', 'Protection from Evil',
-    'Purify Food & Drink', 'Remove Fear', 'Sanctuary', 'Turn Undead']
+    "Bless",
+    "Command",
+    "Cure Light Wounds",
+    "Detect Evil",
+    "Invisibility to Undead",
+    "Protection from Evil",
+    "Purify Food & Drink",
+    "Remove Fear",
+    "Sanctuary",
+    "Turn Undead",
+]
 
-MU_SPELL_SLOTS = [1, 2,2,2, 3,3,3, 4,4,4, 5,5,5, 6,6,6, 7,7,7, 8]
-CLERIC_SPELL_SLOTS = [1, 2, 3,3,3,3, 4,4,4,4, 5,5,5,5, 6,6,6,6, 7, 8]
+MU_SPELL_SLOTS = [1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 8]
+CLERIC_SPELL_SLOTS = [1, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 8]
 
 MU_SPELL_NOTES = "You must add random spells as follows:\n\n"
 CLERIC_SPELL_NOTES = "You have access to all Cleric spells of level {} or lower."
 
 FILLABLE_SPELL_SHEET = os.path.join(
-    os.path.dirname(__file__),
-    'LotFPSpellSheetFillable.pdf')
+    os.path.dirname(__file__), "LotFPSpellSheetFillable.pdf"
+)
 
 SPELL_FIELDS = [
-    'Spell', 'Duration', 'Range', 'Save',
-    'Reversible', 'Effect', 'Flavor', 'Page']
+    "Spell",
+    "Duration",
+    "Range",
+    "Save",
+    "Reversible",
+    "Effect",
+    "Flavor",
+    "Page",
+]
 
 
 def add_class_based_spells(spell_list, pc_class, level):
     """Add class-specific spells to the spell list."""
-    if pc_class == 'Magic-User':
-        spell_list.append('Summon')
-    if pc_class == 'Cleric':
+    if pc_class == "Magic-User":
+        spell_list.append("Summon")
+    if pc_class == "Cleric":
         spell_list = CLERIC_SPELLS if level < 2 else []
-    if pc_class == 'Elf':
-        spell_list = ['Read Magic']
+    if pc_class == "Elf":
+        spell_list = ["Read Magic"]
     return spell_list
 
 
@@ -43,9 +58,9 @@ def create_spell_list(original_spell_list, pcClass, level):
     spell_list = add_class_based_spells(original_spell_list, pcClass, level)
 
     # Correct for spelling error in Magic Missile
-    if 'Magic Missle' in spell_list:
-        spell_list.remove('Magic Missle')
-        spell_list.append('Magic Missile')
+    if "Magic Missle" in spell_list:
+        spell_list.remove("Magic Missle")
+        spell_list.append("Magic Missile")
     return spell_list
 
 
@@ -125,8 +140,8 @@ def get_magic_notes(pcClass, level, highest_spell_level):
     if pcClass.casefold() == "Magic-User".casefold() and level > 1:
         spells_to_be_added = [0 for i in range(highest_spell_level)]
         spells_to_be_added = list_number_of_random_spells_by_level(
-            spells_to_be_added,
-            level)
+            spells_to_be_added, level
+        )
         notes = MU_SPELL_NOTES
 
         for i in range(highest_spell_level):
@@ -150,9 +165,9 @@ def get_magic_notes(pcClass, level, highest_spell_level):
 
 def create_spellsheet_pdf(details, PC_name, filename=None, directory=None):
     """Get spell list for character, fill spell sheet PDF with spell information."""
-    spell_list = create_spell_list(details['spell'], details['class'], details['level'])
-    spell_details = tools.get_item_details(spell_list, 'Spell', filename=None)
-    spell_slots = get_spell_slots(details['class'], details['level'])
+    spell_list = create_spell_list(details["spell"], details["class"], details["level"])
+    spell_details = tools.get_item_details(spell_list, "Spell", filename=None)
+    spell_slots = get_spell_slots(details["class"], details["level"])
 
     i = 0
     for item in spell_details:
@@ -162,37 +177,38 @@ def create_spellsheet_pdf(details, PC_name, filename=None, directory=None):
             del item[name]
         i += 1
 
-    spell_list = tools.add_PDF_field_names(spell_list, 'Spell')
+    spell_list = tools.add_PDF_field_names(spell_list, "Spell")
     for item in spell_details:
         spell_list = {**spell_list, **item}
 
-    spell_list['MagicNotes'] = get_magic_notes(
-        details['class'],
-        details['level'],
-        len(spell_slots))
+    spell_list["MagicNotes"] = get_magic_notes(
+        details["class"], details["level"], len(spell_slots)
+    )
 
-    spell_slots = tools.add_PDF_field_names(spell_slots, details['class'])
+    spell_slots = tools.add_PDF_field_names(spell_slots, details["class"])
     spell_list = {**spell_list, **spell_slots}
 
     if directory is None:
         directory = tempfile.TemporaryDirectory(dir=os.getcwd()).name
 
-    spell_name = PC_name + '_Spells.pdf'
-    spell_fdf_name = PC_name + '_Spells.fdf'
+    spell_name = PC_name + "_Spells.pdf"
+    spell_fdf_name = PC_name + "_Spells.fdf"
 
     fdf_spell_data = forge_fdf("", spell_list, [], [], [])
-    with open(os.path.join(directory, spell_fdf_name), 'wb') as f:
+    with open(os.path.join(directory, spell_fdf_name), "wb") as f:
         f.write(fdf_spell_data)
 
     path_to_pdftk = tools.get_pdftk_path()
 
-    args = [path_to_pdftk,
-            FILLABLE_SPELL_SHEET,
-            'fill_form',
-            spell_fdf_name,
-            'output',
-            spell_name,
-            'flatten']
+    args = [
+        path_to_pdftk,
+        FILLABLE_SPELL_SHEET,
+        "fill_form",
+        spell_fdf_name,
+        "output",
+        spell_name,
+        "flatten",
+    ]
 
     # Fill the spell form with PDFtk, store them in the tempfiles directory.
     subprocess.run(args, cwd=directory, **tools.subprocess_args(False))

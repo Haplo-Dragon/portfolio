@@ -8,8 +8,8 @@ import lament_mod.character as character
 def app():
     """Create a new app for each test."""
     app = ethan_portfolio.create_app()
-    app.config['TESTING'] = True
-    app.config['SECRET_KEY'] = 'TestingKey'
+    app.config["TESTING"] = True
+    app.config["SECRET_KEY"] = "TestingKey"
     # app.config['SERVER_NAME'] = 'localhost:42000'
     app.allow_subdomain_redirects = True
     return app
@@ -29,7 +29,8 @@ def normal_equipment():
         "Normal1": "Towel",
         "Normal2": "Extra Head",
         "Normal3": "Chain Armor",
-        "Normal4": "Plate Armor"}
+        "Normal4": "Plate Armor",
+    }
 
 
 @pytest.fixture
@@ -38,12 +39,13 @@ def oversized_equipment():
     return {
         "Over0": "Marvin",
         "Over1": "Infinite Improbability Drive",
-        "Over2": "Krikkit bat"}
+        "Over2": "Krikkit bat",
+    }
 
 
 @pytest.fixture
 def halfling(mocker):
-    mock_fetch = mocker.patch('lament_mod.lament.tools.fetch_character')
-    with open('tests/mocked_fetch_character.json', 'r') as f:
+    mock_fetch = mocker.patch("lament_mod.lament.tools.fetch_character")
+    with open("tests/mocked_fetch_character.json", "r") as f:
         mock_fetch.return_value = json.load(f)
     return character.LotFPCharacter()
