@@ -4,10 +4,10 @@ import lament_mod.character as character
 
 
 @pytest.mark.parametrize("character_class, expected_alignment", [
-    ("Halfling", None),
-    ("Cleric", "Lawful"),
-    ("Magic-User", "Chaotic"),
-    ("Elf", "Chaotic")])
+    (character.CharClass.HALFLING, None),
+    (character.CharClass.CLERIC, "Lawful"),
+    (character.CharClass.MAGIC_USER, "Chaotic"),
+    (character.CharClass.ELF, "Chaotic")])
 def test_align(halfling, character_class, expected_alignment):
     """Is alignment assigned correctly based on class?"""
     halfling.pcClass = character_class

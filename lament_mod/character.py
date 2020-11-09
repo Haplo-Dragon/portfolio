@@ -3,35 +3,52 @@ import math
 import numpy as np
 import lament_mod.tools as tools
 
+from enum import Enum
 
-NON_HUMANS = ["Dwarf".casefold(), "Elf".casefold(), "Halfling".casefold()]
+
+class CharClass(Enum):
+    CLERIC = "Cleric".casefold()
+    FIGHTER = "Fighter".casefold()
+    MAGIC_USER = "Magic-User".casefold()
+    SPECIALIST = "Specialist".casefold()
+    DWARF = "Dwarf".casefold()
+    ELF = "Elf".casefold()
+    HALFLING = "Halfling".casefold()
+
+
+# This map will allow us to use the string value we get from the API to assign an Enum.
+CLASS_MAP = {char_class.value: char_class for char_class in CharClass}
+
+NON_HUMANS = [CharClass.DWARF, CharClass.ELF, CharClass.HALFLING]
+SPELLCASTERS = [CharClass.CLERIC, CharClass.MAGIC_USER, CharClass.ELF]
+CHAOTICS = [CharClass.MAGIC_USER, CharClass.ELF]
 
 HIT_DICE = {
-    'Cleric': 6,
-    'Fighter': 8,
-    'Magic-User': 4,
-    'Specialist': 6,
-    'Dwarf': 10,
-    'Elf': 6,
-    'Halfling': 6}
+    CharClass.CLERIC: 6,
+    CharClass.FIGHTER: 8,
+    CharClass.MAGIC_USER: 4,
+    CharClass.SPECIALIST: 6,
+    CharClass.DWARF: 10,
+    CharClass.ELF: 6,
+    CharClass.HALFLING: 6}
 
 HIT_BONUSES = {
-    'Cleric': 2,
-    'Fighter': 3,
-    'Magic-User': 1,
-    'Specialist': 2,
-    'Dwarf': 3,
-    'Elf': 2,
-    'Halfling': 2}
+    CharClass.CLERIC: 2,
+    CharClass.FIGHTER: 3,
+    CharClass.MAGIC_USER: 1,
+    CharClass.SPECIALIST: 2,
+    CharClass.DWARF: 3,
+    CharClass.ELF: 2,
+    CharClass.HALFLING: 2}
 
 MIN_HP = {
-    'Cleric': 4,
-    'Fighter': 8,
-    'Magic-User': 3,
-    'Specialist': 4,
-    'Dwarf': 6,
-    'Elf': 4,
-    'Halfling': 4}
+    CharClass.CLERIC: 4,
+    CharClass.FIGHTER: 8,
+    CharClass.MAGIC_USER: 3,
+    CharClass.SPECIALIST: 4,
+    CharClass.DWARF: 6,
+    CharClass.ELF: 4,
+    CharClass.HALFLING: 4}
 
 # These correspond to Paralyze, Poison, Breath, Device, and Magic in the LotFP rules.
 # The names are different to maintain compatibility with the remote generator.
@@ -40,44 +57,44 @@ SAVE_NAMES = ['stone', 'poison', 'breath', 'wands', 'magic']
 # This is how often the saves change. As in, the saves change every X levels, and this
 # is X.
 SAVE_CHANGE_INTERVALS = {
-    'Cleric': 4,
-    'Fighter': 3,
-    'Magic-User': 5,
-    'Specialist': 4,
-    'Dwarf': 3,
-    'Elf': 3,
-    'Halfling': 2}
+    CharClass.CLERIC: 4,
+    CharClass.FIGHTER: 3,
+    CharClass.MAGIC_USER: 5,
+    CharClass.SPECIALIST: 4,
+    CharClass.DWARF: 3,
+    CharClass.ELF: 3,
+    CharClass.HALFLING: 2}
 
 # In order to save space (and sanity), we're representing the saves as two-dimensional
 # arrays, with one row for initial (level 1) values and further rows representing each
 # time the saves change (4 to 6 times per class). This allows us to have 4-6 rows per
 # class, rather than 17+.
 LOTFP_SAVES = {
-    'Cleric': np.array(
+    CharClass.CLERIC: np.array(
         [[14, 11, 16, 12, 15],
          [-2, -2, -2, -2, -3],
          [-2, -2, -2, -2, -3],
          [-2, -4, -4, -4, -3],
          [-2, -1, -2, 0, -1]]),
-    'Fighter': np.array(
+    CharClass.FIGHTER: np.array(
         [[14, 12, 15, 13, 16],
          [-2, -2, -2, -2, -2],
          [-2, -2, -4, -2, -2],
          [-2, -2, -2, -2, -2],
          [-2, -2, -2, -2, -2]]),
-    'Magic-User': np.array(
+    CharClass.MAGIC_USER: np.array(
         [[13, 13, 16, 13, 14],
          [-2, -2, -2, -2, -2],
          [-2, -2, -2, -2, -4],
          [-3, -2, -4, -4, -2],
          [-1, -1, -1, -1, -2]]),
-    'Specialist': np.array(
+    CharClass.SPECIALIST: np.array(
         [[14, 16, 15, 14, 14],
          [-3, -4, -1, -1, -2],
          [-2, -2, -2, -2, -2],
          [-2, -2, -2, -2, -2],
          [-2, -2, -2, -2, -2]]),
-    'Dwarf': np.array(
+    CharClass.DWARF: np.array(
         [[10, 8, 13, 9, 12],
          [-2, -2, -3, -2, -2],
          [-2, -2, -3, -2, -2],
@@ -88,7 +105,7 @@ LOTFP_SAVES = {
     # save interval would suggest that it does. The easiest way to handle this (without
     # a lot of extra code) is to pad the array so that 16 does NOT change and 17 does.
     # This allows us to keep the special case code the same for all classes.
-    'Elf': np.array(
+    CharClass.ELF: np.array(
         [[13, 12, 15, 13, 15],
          [-2, -2, -2, -2, -2],
          [-2, -2, -4, -2, -2],
@@ -96,7 +113,7 @@ LOTFP_SAVES = {
          [-2, -2, -2, -2, -2],
          [0, 0, 0, 0, 0],
          [-2, -1, -2, -2, -2]]),
-    'Halfling': np.array(
+    CharClass.HALFLING: np.array(
         [[10, 8, 13, 9, 12],
          [-2, -2, -3, -2, -2],
          [-2, -2, -3, -2, -2],
@@ -114,12 +131,13 @@ class LotFPCharacter(object):
                  calculate_encumbrance=True,
                  counter=1):
         self.details = tools.fetch_character(desired_class)
-        self.pcClass = self.details['class']
+        # self.pcClass = self.details['class']
+        self.pcClass = CLASS_MAP[self.details['class'].casefold()]
         self.level = desired_level
         self.calculate_encumbrance = calculate_encumbrance
         self.counter = counter
 
-        self.name = '_'.join([str(self.counter + 1), self.pcClass])
+        self.name = '_'.join([str(self.counter + 1), self.pcClass.value])
         self.fdf_name = self.name + '.fdf'
         self.filled_name = self.name + '_Filled.pdf'
 
@@ -128,10 +146,15 @@ class LotFPCharacter(object):
         self.mods = self.split_mods()
         self.hp = self.get_hp(self.level)
         self.saves = self.get_saves()
+
         self.skills = {item[0]: item[1] for item in self.details['skills']}
-        if self.pcClass.casefold() in NON_HUMANS and self.level > 1:
+        if self.pcClass in NON_HUMANS and self.level > 1:
             self.get_nonhuman_skills()
-        self.skill_points = 2 * (self.level - 1) if self.pcClass == "Specialist" else None
+        # Specialists get skill points to spend.
+        if self.pcClass is CharClass.SPECIALIST:
+            self.skill_points = 2 * (self.level - 1)
+        else:
+            self.skill_points = None
 
         self.equipment = tools.format_equipment_list(
             self.details,
@@ -175,11 +198,29 @@ class LotFPCharacter(object):
         for item in reformatted:
             self.details = {**self.details, **item}
 
+    def is_spellcaster(self):
+        return self.pcClass in SPELLCASTERS
+
+    def is_nonhuman(self):
+        return self.pcClass in NON_HUMANS
+
+    def is_special_case_for_saves(self):
+        """
+        Determine if the character's saves must be calculated by special case.
+
+        Magic-User saves are special case at level 19+, Dwarf saves are special
+        case at level 12+, and Elf saves are special case at level 16+.
+        """
+        return (self.pcClass is CharClass.MAGIC_USER and self.level >= 19) or \
+               (self.pcClass is CharClass.DWARF and self.level >= 12) or \
+               (self.pcClass is CharClass.ELF and self.level >= 17) or \
+               (self.pcClass is CharClass.HALFLING)
+
     def align(self):
         alignment = None
-        if self.pcClass.casefold() == 'Cleric'.casefold():
+        if self.pcClass is CharClass.CLERIC:
             alignment = 'Lawful'
-        if self.pcClass.casefold() in ('Magic-User'.casefold(), 'Elf'.casefold()):
+        if self.pcClass in CHAOTICS:
             alignment = 'Chaotic'
 
         return alignment
@@ -225,7 +266,7 @@ class LotFPCharacter(object):
 
             # ...account for the irritating fact that Magic-Users (and ONLY Magic-Users)
             # have a d6 hit die at first level and a d4 at 2nd level and up...
-            if self.pcClass.casefold() in "Magic-User".casefold():
+            if self.pcClass is CharClass.MAGIC_USER:
                 hit_die = 6
             # ...then add the final roll for level 1 or the minimum HP for the class,
             # whichever is higher.
@@ -240,7 +281,7 @@ class LotFPCharacter(object):
             hp += hit_bonus * (level - 9)
 
             # Dwarves keep adding their CON bonus even after level 10. No one else does.
-            if self.pcClass.casefold() in "Dwarf".casefold():
+            if self.pcClass is CharClass.DWARF:
                 hp += int(self.mods['CONmod']) * (level - 9)
 
             # Recursively call this function for all the levels from 9 down
@@ -249,10 +290,6 @@ class LotFPCharacter(object):
     def get_saves(self):
         """
         Calculate save values for a given character class and level.
-
-        :param pcClass: The character class of the character.
-        :param level: The character's level.
-        :param mods: The attribute modifiers of the character.
         :return: A dictionary of saves in the form 'poison': 12.
         """
         interval = SAVE_CHANGE_INTERVALS[self.pcClass]
@@ -262,8 +299,8 @@ class LotFPCharacter(object):
         # for Dwarves, 17+ are special cases for Elves, and Halflings are a
         # PAIN IN THE ASS. Halflings change immediately at level 2 and then every two
         # levels thereafter.
-        if tools.is_special_case_for_saves(self.pcClass, effective_level):
-            if self.pcClass.casefold() == "Halfling".casefold():
+        if self.is_special_case_for_saves():
+            if self.pcClass is CharClass.HALFLING:
                 effective_level += 1
             else:
                 effective_level += interval
@@ -287,16 +324,17 @@ class LotFPCharacter(object):
         return saves
 
     def get_nonhuman_skills(self):
-        if self.pcClass.casefold() == "Dwarf".casefold() and "Architecture" in self.skills:
+        if self.pcClass is CharClass.DWARF and "Architecture" in self.skills:
             self.skills['Architecture'] = min(2 + math.ceil(self.level / 3), 6)
-        if self.pcClass.casefold() == "Elf".casefold() and "Search" in self.skills:
+
+        if self.pcClass is CharClass.ELF and "Search" in self.skills:
             self.skills['Search'] = min(1 + math.ceil(self.level / 3), 6)
-        if self.pcClass.casefold() == "Halfling".casefold() and "Bushcraft" in self.skills:
+
+        if self.pcClass is CharClass.HALFLING and "Bushcraft" in self.skills:
             self.skills['Bushcraft'] = min(2 + math.ceil(self.level / 3), 6)
-        return
 
     def calculate_attack_bonuses(self):
-        if self.pcClass.casefold() == 'Fighter'.casefold():
+        if self.pcClass is CharClass.FIGHTER:
             base = min(2 + (self.level - 1), 10)
         else:
             base = 1

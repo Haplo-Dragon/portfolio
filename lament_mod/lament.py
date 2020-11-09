@@ -184,9 +184,7 @@ def generate_individual_chars(num_characters, temp_directory, char_class, char_l
 
         # If the character has spells, create a PDF spell sheet and fill
         # it with spells and spell info.
-        # TODO Add attribute to Character class to check if spellcaster (i.e.,
-        # "if PC.isSpellcaster")
-        if PC.pcClass in ["Cleric", "Magic-User", "Elf"]:
+        if PC.is_spellcaster():
             spells.create_spellsheet_pdf(
                 PC.details, PC.name, filename=None, directory=temp_directory.name
             )

@@ -343,15 +343,3 @@ def get_item_details(original_item_list, item_type, filename=None):
                 item_details.append(row)
 
     return item_details
-
-
-def is_special_case_for_saves(pcClass, level):
-    """Determine if the character's saves must be calculated by special case.
-
-    Magic-User saves are special case at level 19+, Dwarf saves are special
-    case at level 12+, and Elf saves are special case at level 16+.
-    """
-    return (pcClass.casefold() in "Magic-User".casefold() and level >= 19) or\
-           (pcClass.casefold() in "Dwarf".casefold() and level >= 12) or\
-           (pcClass.casefold() in "Elf".casefold() and level >= 17) or\
-           (pcClass.casefold() in "Halfling".casefold())
