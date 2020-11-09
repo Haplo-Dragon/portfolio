@@ -7,44 +7,31 @@ import os
 import platform
 
 LEVEL_ONE_SPELLS = os.path.join(
-    os.path.dirname(__file__),
-    "Item Lists",
-    "LevelOneSpells.csv")
+    os.path.dirname(__file__), "Item Lists", "LevelOneSpells.csv"
+)
 
-OVERSIZED_ITEMS = os.path.join(
-    os.path.dirname(__file__),
-    "Item Lists",
-    "Oversized.txt")
+OVERSIZED_ITEMS = os.path.join(os.path.dirname(__file__), "Item Lists", "Oversized.txt")
 
-TINY_ITEMS = os.path.join(
-    os.path.dirname(__file__),
-    "Item Lists",
-    "TinyItems.txt")
+TINY_ITEMS = os.path.join(os.path.dirname(__file__), "Item Lists", "TinyItems.txt")
 
-WEAPONS = os.path.join(
-    os.path.dirname(__file__),
-    "Item Lists",
-    "Weapons.txt")
+WEAPONS = os.path.join(os.path.dirname(__file__), "Item Lists", "Weapons.txt")
 
-WEAPON_STATS = os.path.join(
-    os.path.dirname(__file__),
-    "Item Lists",
-    "WeaponStats.csv")
+WEAPON_STATS = os.path.join(os.path.dirname(__file__), "Item Lists", "WeaponStats.csv")
 
-WEAPON_FIELDS = ['Weapon', 'Damage', 'Short', 'Medium', 'Long', 'Ammo']
+WEAPON_FIELDS = ["Weapon", "Damage", "Short", "Medium", "Long", "Ammo"]
 
 CHARACTER_GEN_URL = "http://character.totalpartykill.ca/lotfp/json"
 
 
-def add_PDF_field_names(equiplist, type='NonEnc'):
+def add_PDF_field_names(equiplist, type="NonEnc"):
     """Takes a list of items and their type and returns a dictionary with the items
-     as values and the type followed by a sequential number (type0, type1, etc.) as
-     keys. These are generally used to fill fields in a blank PDF, with keys
-     corresponding to field names.
-     """
+    as values and the type followed by a sequential number (type0, type1, etc.) as
+    keys. These are generally used to fill fields in a blank PDF, with keys
+    corresponding to field names.
+    """
     equipdict = {}
     for index, item in enumerate(equiplist):
-        prefix = ''.join((type, str(index)))
+        prefix = "".join((type, str(index)))
         equipdict[prefix] = equiplist[index]
     return equipdict
 
@@ -54,10 +41,8 @@ def get_pdftk_path():
         path_to_pdftk = "pdftk"
     else:
         path_to_pdftk = os.path.join(
-            os.path.dirname(__file__),
-            "PDFtk",
-            "bin",
-            "pdftk.exe")
+            os.path.dirname(__file__), "PDFtk", "bin", "pdftk.exe"
+        )
 
     return path_to_pdftk
 
@@ -76,7 +61,7 @@ def subprocess_args(include_stdout=True):
                               **subprocess_args(False))
     The following is true only on Windows.
     """
-    if hasattr(subprocess, 'STARTUPINFO'):
+    if hasattr(subprocess, "STARTUPINFO"):
         # On Windows, subprocess calls will pop up a command window by default
         # when run from Pyinstaller with the ``--noconsole`` option. Avoid this
         # distraction.
@@ -99,7 +84,7 @@ def subprocess_args(include_stdout=True):
         #
         # So, add it only if it's needed.
     if include_stdout:
-        ret = {'stdout:': subprocess.PIPE}
+        ret = {"stdout:": subprocess.PIPE}
     else:
         ret = {}
 
@@ -107,19 +92,23 @@ def subprocess_args(include_stdout=True):
         # with the ``--noconsole`` option requires redirecting everything
         # (stdin, stdout, stderr) to avoid an OSError exception
         # "[Error 6] the handle is invalid."
-    ret.update({'stdin': subprocess.PIPE,
-                'stderr': subprocess.PIPE,
-                'startupinfo': si,
-                'env': env})
+    ret.update(
+        {
+            "stdin": subprocess.PIPE,
+            "stderr": subprocess.PIPE,
+            "startupinfo": si,
+            "env": env,
+        }
+    )
     return ret
 
 
 def fetch_character(pc_class=None):
     """Fetch character data JSON from the remote generator."""
     with requests.session() as r:
-        details = {'class': ""}
+        details = {"class": ""}
         if pc_class:
-            while details['class'] != pc_class:
+            while details["class"] != pc_class:
                 try:
                     r = requests.get(CHARACTER_GEN_URL, timeout=10)
                     details = r.json()
@@ -157,7 +146,7 @@ def format_equipment_list(details, calculate_encumbrance=True):
     and encumbrance, prefixed with the proper PDF field names.
     """
     # Get a list of equipment (including money and weapons)
-    equipment = details['equipment']
+    equipment = details["equipment"]
 
     # Split the money, non-encumbering, and oversized items from the
     # equipment list
@@ -167,15 +156,16 @@ def format_equipment_list(details, calculate_encumbrance=True):
     equipment, money = split_money(equipment)
 
     # Generate dictionary version of the normal equipment list
-    normal_equipment = add_PDF_field_names(equipment, 'Normal')
+    normal_equipment = add_PDF_field_names(equipment, "Normal")
 
     if calculate_encumbrance:
-        encumbrance = {'Encumbrance': get_encumbrance(
-            normal_equipment,
-            over_equipment,
-            details['class'])}
+        encumbrance = {
+            "Encumbrance": get_encumbrance(
+                normal_equipment, over_equipment, details["class"]
+            )
+        }
     else:
-        encumbrance = {'Encumbrance': ""}
+        encumbrance = {"Encumbrance": ""}
 
     # Create a combined equipment list
     comb_equipment = {}
@@ -186,7 +176,7 @@ def format_equipment_list(details, calculate_encumbrance=True):
         **normal_equipment,
         **money,
         **weapons,
-        **encumbrance
+        **encumbrance,
     }
 
     return comb_equipment
@@ -198,7 +188,7 @@ def split_over(target, filename=None):
     if filename is None:
         filename = OVERSIZED_ITEMS
 
-    with open(filename, 'r') as o:
+    with open(filename, "r") as o:
         oversized = o.read().splitlines()
 
     for item in target:
@@ -206,7 +196,7 @@ def split_over(target, filename=None):
             over.append(item)
             target.remove(item)
 
-    over = add_PDF_field_names(over, 'Over')
+    over = add_PDF_field_names(over, "Over")
 
     return (target, over)
 
@@ -217,7 +207,7 @@ def split_tiny(target, filename=None):
     if filename is None:
         filename = TINY_ITEMS
 
-    with open(filename, 'r') as t:
+    with open(filename, "r") as t:
         tiny = t.read().splitlines()
 
     for item in tiny:
@@ -225,7 +215,7 @@ def split_tiny(target, filename=None):
             non_enc.append(item)
             target.remove(item)
 
-    non_enc = add_PDF_field_names(non_enc, 'NonEnc')
+    non_enc = add_PDF_field_names(non_enc, "NonEnc")
 
     return (target, non_enc)
 
@@ -234,14 +224,14 @@ def split_money(target):
     """Split money from the equipment list and return both lists."""
     money = {}
     for item in target:
-        cp_index = item.find(' Cp')
-        sp_index = item.find(' sp')
+        cp_index = item.find(" Cp")
+        sp_index = item.find(" sp")
         if (cp_index is not -1) and (sp_index is not -1):
-            money['cp'] = item[item.find(' Cp') - 2:]
-            money['sp'] = item[:item.find(' sp') + 3]
+            money["cp"] = item[item.find(" Cp") - 2 :]
+            money["sp"] = item[: item.find(" sp") + 3]
             target.remove(item)
         elif cp_index is not -1:
-            money['cp'] = item[cp_index - 1]
+            money["cp"] = item[cp_index - 1]
             target.remove(item)
 
     return (target, money)
@@ -259,9 +249,9 @@ def get_encumbrance(normal_items, oversized_items, pc_class):
 
     # Check for chain or plate armor that would add extra encumbrance
     for item in normal_items.values():
-        if 'Chain Armor'.casefold() in item.casefold():
+        if "Chain Armor".casefold() in item.casefold():
             encumbrance += 1
-        if 'Plate Armor'.casefold() in item.casefold():
+        if "Plate Armor".casefold() in item.casefold():
             encumbrance += 2
     # if 'Chain Armor' in normal_items.values():
     #     encumbrance += 1
@@ -274,7 +264,7 @@ def get_encumbrance(normal_items, oversized_items, pc_class):
 
     # Dwarves can carry more, so their first point of encumbrance
     # doesn't count.
-    if pc_class == 'Dwarf':
+    if pc_class == "Dwarf":
         encumbrance -= 1
 
     # Make sure encumbrance isn't negative. Wouldn't want characters
@@ -288,7 +278,7 @@ def get_encumbrance(normal_items, oversized_items, pc_class):
 def get_weapons_and_stats(original_equipment_list, filename=None):
     """Split weapons from equipment list, add stats, and return them."""
     weapondict = {}
-    weapon_details = get_item_details(original_equipment_list, 'Weapon', filename=None)
+    weapon_details = get_item_details(original_equipment_list, "Weapon", filename=None)
     weapon_details = get_ammo(original_equipment_list, weapon_details)
 
     i = 0
@@ -308,20 +298,20 @@ def get_weapons_and_stats(original_equipment_list, filename=None):
 def get_ammo(original_equipment_list, weapon_details):
     """Find ammo in equipment list and associate it with the correct weapon."""
     for weapon in weapon_details:
-        if weapon['Ammo'] == 'Yes':
+        if weapon["Ammo"] == "Yes":
             for item in original_equipment_list:
-                arrows_index = item.find('Arrows')
+                arrows_index = item.find("Arrows")
                 if arrows_index is not -1:
-                    weapon['Ammo'] = item[arrows_index - 3:]
+                    weapon["Ammo"] = item[arrows_index - 3 :]
         else:
-            weapon['Ammo'] = ""
+            weapon["Ammo"] = ""
     return weapon_details
 
 
 def clear_mod_zeroes(modsdict):
     """Clear zeroes from dictionary of attributes and modifiers."""
     for item in modsdict.keys():
-        if modsdict[item] == '0':
+        if modsdict[item] == "0":
             modsdict[item] = ""
     return modsdict
 
@@ -331,12 +321,12 @@ def get_item_details(original_item_list, item_type, filename=None):
     text for original_item_list, drawn from the file specified or from the default
     files defined in LEVEL_ONE_SPELLS and WEAPON_STATS.
     """
-    item_types = {'Spell': LEVEL_ONE_SPELLS, 'Weapon': WEAPON_STATS}
+    item_types = {"Spell": LEVEL_ONE_SPELLS, "Weapon": WEAPON_STATS}
     item_details = []
     if filename is None:
         filename = item_types[item_type]
 
-    with open(filename, encoding='utf8', newline='') as csvfile:
+    with open(filename, encoding="utf8", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             if row[item_type] in original_item_list:
